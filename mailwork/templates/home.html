@@ -1,0 +1,32 @@
+{% extends 'catalog/base.html' %}
+{% load my_tags %}
+{% block content %}
+<header>
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Skystore</h1>
+        {% if user.is_authenticated %}
+            <p class="lead">Добро пожаловать на наш сайт, {{ user.email }}!</p>
+        {% else %}
+            <p class="lead">Добро пожаловать на наш сайт! Для работы с функционалом сайта войдите или зарегиструйтесь</p>
+        {% endif %}
+    </div>
+</header>
+<div class="container">
+    <div class="row text-center">
+        {% for product in products %}
+        <div class="col-3">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <img src="{{ product.product_image | media_filter }}">
+                    <h4 class="my-0 font-weight-normal">{{ product.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title pricing-card-title">{{ product.price }} р.</h3>
+                    <a type="button" class="btn btn-lg btn-block btn-outline-primary" href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
