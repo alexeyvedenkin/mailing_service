@@ -53,6 +53,7 @@ class NewsLetter(models.Model):
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
 
+
 class SendingAttempt(models.Model):
     """ Определяет параметры модели попытки рассылки """
     attempt_time = models.DateTimeField(verbose_name="Дата и время попытки")

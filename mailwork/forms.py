@@ -13,6 +13,7 @@ class RecipientForm(forms.ModelForm):
             "comment",
         ]
 
+
 class MessageForm(forms.ModelForm):
     pass
     # class Meta:
@@ -22,6 +23,7 @@ class MessageForm(forms.ModelForm):
     #         "fullname",
     #         "comment",
     #     ]
+
 
 class NewsLetterForm(forms.ModelForm):
     pass

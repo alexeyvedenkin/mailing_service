@@ -28,9 +28,11 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
     template_name = 'mailwork/recipient_form.html'
     success_url = reverse_lazy("mailwork:recipient_list")
 
+
 class RecipientDetailView(LoginRequiredMixin, DetailView):
     """ Контроллер для отображения экземпляра класса Recipient """
     model = Recipient
+
 
 class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     """ Контроллер для редактирования экземпляра класса Recipient """
@@ -39,15 +41,18 @@ class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'mailwork/recipient_form.html'
     success_url = reverse_lazy("mailwork:recipient_list")
 
+
 class RecipientDeleteView(LoginRequiredMixin, DeleteView):
     """ Контроллер для удаления экземпляра класса Recipient """
     model = Recipient
+
 
 class MessageListView(LoginRequiredMixin, ListView):
     """ Контроллер для отображения списка сообщений """
     model = Message
     context_object_name = "messages"
     template_name = "messages_list.html"
+
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
     """ Контроллер для создания экземпляра класса Message """
@@ -56,9 +61,11 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     template_name = 'mailwork/message_form.html'
     success_url = reverse_lazy("mailwork:messages_list")
 
+
 class MessageDetailView(LoginRequiredMixin, DetailView):
     """ Контроллер для отображения экземпляра класса Message """
     model = Message
+
 
 class MessageUpdateView(LoginRequiredMixin, UpdateView):
     """ Контроллер для редактирования экземпляра класса Message """
@@ -67,15 +74,18 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'mailwork/message_form.html'
     success_url = reverse_lazy("mailwork:messages_list")
 
+
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
     """ Контроллер для удаления экземпляра класса Message """
     model = Message
+
 
 class NewsLetterListView(LoginRequiredMixin, ListView):
     """ Контроллер для отображения списка рассылок """
     model = NewsLetter
     context_object_name = "newsletters"
     template_name = "newsletters_list.html"
+
 
 class NewsLetterCreateView(LoginRequiredMixin, CreateView):
     """ Контроллер для создания экземпляра класса NewsLetter """
@@ -84,9 +94,11 @@ class NewsLetterCreateView(LoginRequiredMixin, CreateView):
     template_name = 'mailwork/newsletter_form.html'
     success_url = reverse_lazy("mailwork:newsletters_list")
 
+
 class NewsLetterDetailView(LoginRequiredMixin, DetailView):
     """ Контроллер для отображения экземпляра класса NewsLetter """
     model = NewsLetter
+
 
 class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
     """ Контроллер для редактирования экземпляра класса NewsLetter """
@@ -95,9 +107,11 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'mailwork/newsletters_form.html'
     success_url = reverse_lazy("mailwork:newsletters_list")
 
+
 class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
     """ Контроллер для удаления экземпляра класса NewsLetter """
     model = NewsLetter
+
 
 class HomeTemplateView(TemplateView):
     """Выполняет переход к главной странице"""
