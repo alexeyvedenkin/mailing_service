@@ -17,12 +17,11 @@
         <div class="col-3">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
-                    <img src="{{ product.product_image | media_filter }}">
-                    <h4 class="my-0 font-weight-normal">{{ product.name }}</h4>
+                    <h4 class="my-0 font-weight-normal">{{ message.theme }}</h4>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title pricing-card-title">{{ product.price }} р.</h3>
-                    <a type="button" class="btn btn-lg btn-block btn-outline-primary" href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
+                    <h3 class="card-title pricing-card-title">{{ message.description|truncatewords:10 }}</h3>
+                    <a type="button" class="btn btn-lg btn-block btn-outline-primary" href="{% url 'mailwork:message_detail' message.pk %}">Подробнее</a>
                 </div>
             </div>
         </div>
