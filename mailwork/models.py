@@ -1,4 +1,9 @@
+from datetime import timezone
+
+from django.core.mail import send_mail
 from django.db import models
+
+from users.models import User
 
 
 class Recipient(models.Model):
@@ -47,3 +52,47 @@ class NewsLetter(models.Model):
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
+
+class SendingAttempt(models.Model):
+    """ Определяет параметры модели попытки рассылки """
+    attempt_time = models.DateTimeField(verbose_name="Дата и время попытки")
+    status = models.CharField(max_length=15, choices=[('success', 'Успешно'), ('failure', 'Не успешно')], verbose_name="Статус")
+    server_response = models.TextField(verbose_name="Ответ почтового сервера")
+    newsletter = models.ForeignKey(NewsLetter, on_delete=models.CASCADE, verbose_name="Рассылка")
+
+    class Meta:
+        verbose_name = "Попытка рассылки"
+        verbose_name_plural = "Попытки рассылок"
+
+    def __str__(self) -> str:
+        """ Определяет формат вывода экземпляра класса SendingAttempt """
+        return f"Попытка: {self.attempt_time}, Статус: {self.status}"
+
+    def send_newsletter(self, user: User):  # Добавляем параметр user
+        """ Инициализация отправки рассылки """
+        recipients = self.newsletter.recipients.all()  # type: ignore
+        for recipient in recipients:
+            email = recipient.email  # email экземпляра Recipient
+            try:
+                # Отправка сообщения
+                send_mail(
+                    self.newsletter.message.theme,  # type: ignore
+                    self.newsletter.message.content,  # type: ignore
+                    user.email,  # email экземпляра User
+                    [email],
+                    fail_silently=False,
+                )
+                # Если успех, сохраняем попытку
+                self.create_attempt('success', 'Сообщение успешно отправлено')
+            except Exception as e:
+                # Если ошибка, сохраняем с текстом ошибки
+                self.create_attempt('failure', str(e))
+
+    def create_attempt(self, status, response):
+        """ Создание записи о попытке рассылки """
+        SendingAttempt.objects.create(  # type: ignore
+            attempt_time=timezone.now(),    # type: ignore
+            status=status,
+            server_response=response,
+            newsletter=self.newsletter
+        )
