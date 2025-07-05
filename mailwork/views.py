@@ -98,3 +98,8 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
 class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
     """ Контроллер для удаления экземпляра класса NewsLetter """
     model = NewsLetter
+
+class HomeTemplateView(TemplateView):
+    """Выполняет переход к главной странице"""
+
+    template_name = "mailwork/home.html"
