@@ -3,13 +3,20 @@
 <div class="container">
     <div class="row">
         <div class="col-5">
+            <div class="card-header">
+                <h2 class="card-title">Создание сообщения</h2>
+            </div>
             <form class="row" method="post" enctype="multipart/form-data">
                  <div class="card">
                      <div class="card-body">
                          {% csrf_token %}
                          {{ form.as_p }}
                          <button type="submit" class="btn btn-primary">
-                             Войти
+                             {% if not object %}
+                             Создать
+                             {% else %}
+                             Сохранить
+                             {% endif %}
                          </button>
                          <a class="p-2 btn btn-outline-primary" href="{% url 'mailwork:messages_list' %}">Отмена</a>
                      </div>

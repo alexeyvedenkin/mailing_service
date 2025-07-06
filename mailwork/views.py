@@ -19,7 +19,7 @@ class RecipientListView(LoginRequiredMixin, ListView):
     """ Контроллер для отображения списка получателей """
     model = Recipient
     context_object_name = "recipients"
-    template_name = "recipients_list.html"
+    template_name = "mailwork/recipients_list.html"
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):
     """ Контроллер для создания экземпляра класса Recipient """
@@ -51,7 +51,7 @@ class MessageListView(LoginRequiredMixin, ListView):
     """ Контроллер для отображения списка сообщений """
     model = Message
     context_object_name = "messages"
-    template_name = "messages_list.html"
+    template_name = "mailwork/messages_list.html"
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
@@ -79,12 +79,29 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
     """ Контроллер для удаления экземпляра класса Message """
     model = Message
 
+@login_required
+@permission_required('mailwork.can_unpublish_message', raise_exception=True)
+def publish_message(request, message_id):
+    message = get_object_or_404(Message, pk=message_id)
+    message.is_published = True
+    message.save()
+    return redirect('catalog:non_published_products')
+
+
+@login_required
+@permission_required('mailwork.can_unpublish_message', raise_exception=True)
+def unpublish_message(request, message_id):
+    message = get_object_or_404(Message, pk=message_id)
+    message.is_published = False
+    message.save()
+    return redirect('mailwork:non_published_messages')
+
 
 class NewsLetterListView(LoginRequiredMixin, ListView):
     """ Контроллер для отображения списка рассылок """
     model = NewsLetter
     context_object_name = "newsletters"
-    template_name = "newsletters_list.html"
+    template_name = "mailwork/newsletters_list.html"
 
 
 class NewsLetterCreateView(LoginRequiredMixin, CreateView):
@@ -117,3 +134,21 @@ class HomeTemplateView(TemplateView):
     """Выполняет переход к главной странице"""
 
     template_name = "mailwork/home.html"
+
+
+class NonPublishedMessageListView(ListView):
+    model = Message
+    context_object_name = 'non_published_messages'
+    template_name = 'mailwork/non_published_messages.html'
+
+    def get_queryset(self):
+        return Message.objects.filter(is_published=False)
+
+
+class UserOwnedMessageListView(LoginRequiredMixin, ListView):
+    model = Message
+    context_object_name = 'owned_messages'
+    template_name = 'mailwork/user_owner_messages.html'
+
+    def get_queryset(self):
+        return Message.objects.filter(owner=self.request.user)

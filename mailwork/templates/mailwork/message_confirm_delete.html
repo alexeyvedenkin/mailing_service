@@ -5,13 +5,13 @@
         <div class="col-5">
             <form class="row" method="post" enctype="multipart/form-data">
                  <div class="card">
+                     <p class="card-text">Вы действительно хотите удалить {{ object.name }} ?</p>
                      <div class="card-body">
                          {% csrf_token %}
-                         {{ form.as_p }}
                          <button type="submit" class="btn btn-primary">
-                             Войти
+                             Удалить
                          </button>
-                         <a class="p-2 btn btn-outline-primary" href="{% url 'mailwork:messages_list' %}">Отмена</a>
+                         <a class="p-2 btn btn-outline-primary" href="/messages_list/">Отмена</a>
                      </div>
                  </div>
             </form>

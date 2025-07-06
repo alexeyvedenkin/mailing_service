@@ -4,7 +4,7 @@ from mailwork.apps import MailworkConfig
 from mailwork.views import RecipientListView, RecipientDetailView, RecipientCreateView, RecipientUpdateView, \
     RecipientDeleteView, HomeTemplateView, MessageListView, MessageCreateView, MessageUpdateView, MessageDetailView, \
     MessageDeleteView, NewsLetterListView, NewsLetterCreateView, NewsLetterUpdateView, NewsLetterDetailView, \
-    NewsLetterDeleteView
+    NewsLetterDeleteView, UserOwnedMessageListView, NonPublishedMessageListView, publish_message, unpublish_message
 
 app_name = MailworkConfig.name
 
@@ -18,10 +18,10 @@ urlpatterns = [
     path("", HomeTemplateView.as_view(), name="home"),
 
     # path("messages/", ContactsTemplateView.as_view(), name="contacts"),
-    # path("non_published_products/", NonPublishedProductListView.as_view(), name="non_published_products"),
-    # path('owned-products/', UserOwnedProductListView.as_view(), name='user_owned_products'),
-    # path('product/<int:product_id>/publish/', publish_product, name='publish_product'),
-    # path('product/<int:product_id>/unpublish/', unpublish_product, name='unpublish_product'),
+    path("non_published_messages/", NonPublishedMessageListView.as_view(), name="non_published_messages"),
+    path('owned-messages/', UserOwnedMessageListView.as_view(), name='user_owned_messages'),
+    path('message/<int:message_id>/publish/', publish_message, name='publish_message'),
+    path('message/<int:message_id>/unpublish/', unpublish_message, name='unpublish_message'),
 
     path('messages/', MessageListView.as_view(), name='messages_list'),
     path("message_create/", MessageCreateView.as_view(), name="message_create"),
