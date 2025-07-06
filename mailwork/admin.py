@@ -6,7 +6,6 @@ from mailwork.models import Message, NewsLetter, Recipient, SendingAttempt
 @admin.register(Recipient)
 class RecipientAdmin(admin.ModelAdmin):
     list_display = ("id", "email", "fullname", "comment")
-    search_fields = ("name", "description")
 
 
 @admin.register(Message)
