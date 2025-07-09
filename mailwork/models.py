@@ -43,6 +43,7 @@ class NewsLetter(models.Model):
         ('completed', 'Завершена'),
     ]
 
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец", default=1)
     first_send_time = models.DateTimeField(verbose_name="Дата и время первой отправки", null=True)
     last_send_time = models.DateTimeField(verbose_name="Дата и время последней отправки", null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, verbose_name="Статус", default='created')
