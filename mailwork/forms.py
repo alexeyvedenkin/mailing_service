@@ -14,6 +14,24 @@ class RecipientForm(forms.ModelForm):
             "comment",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super(RecipientForm, self).__init__(*args, **kwargs)
+
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите email'
+        })
+
+        self.fields['fullname'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'username'
+        })
+
+        self.fields['comment'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите комментарий'
+        })
+
 
 class MessageForm(forms.ModelForm):
     """ Устанавливает параметры формы для создания и редактирования сообщения """
@@ -23,6 +41,20 @@ class MessageForm(forms.ModelForm):
             "theme",
             "content",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        self.fields['theme'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите тему сообщения'
+        })
+
+        self.fields['content'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите текст сообщения'
+        })
+
 
     # Пример валидации
     def clean_body(self):
@@ -37,7 +69,6 @@ class NewsLetterForm(forms.ModelForm):
     class Meta:
         model = NewsLetter  # Указываем модель для связи с формой
         fields = [
-            "theme",        # Тема рассылки
             "message",      # Сообщение для рассылки (ForeignKey)
             "recipients",   # Получатели рассылки (ManyToManyField)
             "first_send_time",  # Дата и время первой отправки
