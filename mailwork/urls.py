@@ -22,6 +22,7 @@ urlpatterns = [
     path('owned-messages/', UserOwnedMessageListView.as_view(), name='user_owned_messages'),
     path('message/<int:message_id>/publish/', publish_message, name='publish_message'),
     path('message/<int:message_id>/unpublish/', unpublish_message, name='unpublish_message'),
+    # path('user_owned_newsletters/', UserOwnedNewsLetterListView.as_view(), name='user_owned_newsletters'),
 
     path('messages/', MessageListView.as_view(), name='messages_list'),
     path("message_create/", MessageCreateView.as_view(), name="message_create"),
