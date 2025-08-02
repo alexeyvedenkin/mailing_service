@@ -75,3 +75,16 @@ class NewsLetterForm(forms.ModelForm):
             "last_send_time",   # Дата и времени последней отправки
             "status",       # Статус рассылки
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(NewsLetterForm, self).__init__(*args, **kwargs)
+
+        self.fields['message'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите сообщение для рассылки'
+        })
+
+        self.fields['recipients'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Добавьте адресатов рассылки'
+        })
