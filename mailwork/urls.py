@@ -38,4 +38,7 @@ urlpatterns = [
     path("newsletter/<int:pk>/update/", NewsLetterUpdateView.as_view(), name="newsletter_update"),
     path("newsletter/<int:pk>/delete/", NewsLetterDeleteView.as_view(), name="newsletter_delete"),
 
+    path("newsletter/<int:pk>/start/", NewsLetterDeleteView.as_view(), name="newsletter_start"),
+    path("newsletter/<int:pk>/finish/", NewsLetterDeleteView.as_view(), name="newsletter_finish"),
+
 ]

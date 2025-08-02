@@ -7,9 +7,47 @@
     <h1 class="display-4">Наши рассылки</h1>
 </div>
 <div class="container">
-    {% if user.is_authenticated %}
-    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
-          href="{% url 'mailwork:newsletters_list' %}">Рассылки</a></p>
+    <table class="table table-striped">
+        {% if user.is_authenticated %}
+        <thead>
+            <tr>
+                <th>Владелец</th>
+                <th>Статус</th>
+                <th>Дата первой отправки</th>
+                <th>Дата последней отправки</th>
+                <th>Сообщение</th>
+                <th>Адресаты</th>
+                <th>Доступные действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for newsletter in newsletters %}
+            <tr>
+                <td>{{ newsletter.owner }}</td> <!-- Выводим имя адресата -->
+                <td>{{ newsletter.status }}</td> <!-- Выводим Email адресата -->
+                <td>{{ newsletter.first_send_time }}</td> <!-- Выводим комментарий адресата -->
+                <td>{{ newsletter.last_send_time }}</td> <!-- Выводим комментарий адресата -->
+                <td>{{ newsletter.message }}</td> <!-- Выводим комментарий адресата -->
+                <td>{{ newsletter.recipients }}</td> <!-- Выводим комментарий адресата -->
+                {% if perms.mailwork.can_unpublish_newsletter %}
+                    {% if newsletter.status == "created" %}
+                        <td>
+                            <a type="button" class="btn btn-outline-primary"
+                               href="{% url 'mailwork:newsletter_start' newsletter.pk %}">Запустить</a>
+                            <a type="button" class="btn btn-outline-danger"
+                               href="{% url 'mailwork:newsletter_finish' newsletter.pk %}">Завершить</a>
+                        </td>
+                    {% elif newsletter.status == "started" %}
+                        <td>
+                            <a type="button" class="btn btn-outline-danger"
+                               href="{% url 'mailwork:newsletter_finish' newsletter.pk %}">Завершить</a>
+                        </td>
+                    {% endif %}
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
           href="{% url 'mailwork:newsletter_create' %}">Добавить рассылку</a></p>
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"

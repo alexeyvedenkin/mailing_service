@@ -12,7 +12,7 @@ from django.views.generic import (
 )
 
 from mailwork.forms import RecipientForm, MessageForm, NewsLetterForm
-from mailwork.models import Message, NewsLetter, Recipient
+from mailwork.models import Message, NewsLetter, Recipient, SendingAttempt
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
@@ -124,6 +124,8 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'mailwork/newsletters_form.html'
     success_url = reverse_lazy("mailwork:newsletters_list")
 
+    # def newsletter_start(self):
+
 
 class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
     """ Контроллер для удаления экземпляра класса NewsLetter """
@@ -170,3 +172,21 @@ class NonPublishedNewslettersListView(ListView):
 
     def get_queryset(self):
         return Message.objects.filter(is_published=False)
+
+
+class SendingAttemptCreateView(LoginRequiredMixin, CreateView):
+    model = SendingAttempt
+    context_object_name = 'newsletter_start'
+    template_name = 'mailwork/newsletter_start.html'
+
+
+# class NewsLetterStart(LoginRequiredMixin):
+#     model = NewsLetter
+#     context_object_name = 'newsletter_start'
+#     template_name = 'mailwork/newsletter_start.html'
+#
+#
+# class NewsLetterFinish(LoginRequiredMixin):
+#     model = NewsLetter
+#     context_object_name = 'newsletter_finish'
+#     template_name = 'mailwork/newsletter_finish.html'
