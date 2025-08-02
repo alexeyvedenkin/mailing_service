@@ -11,7 +11,7 @@
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
           href="{% url 'mailwork:message_create' %}">Добавить сообщение</a></p>
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
-          href="{% url 'mailwork:user_owned_newsletters' %}">Мои рассылки</a></p>
+          href="{% url 'mailwork:user_owner_newsletters' %}">Мои рассылки</a></p>
     {% endif %}
     {% if perms.catalog.can_unpublish_product %}
         <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
