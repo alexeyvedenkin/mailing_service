@@ -152,3 +152,21 @@ class UserOwnedMessageListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Message.objects.filter(owner=self.request.user)
+
+
+class UserOwnerNewslettersListView(LoginRequiredMixin, ListView):
+    model = NewsLetter
+    context_object_name = 'owned_newsletters'
+    template_name = 'mailwork/user_owner_newsletters.html'
+
+    def get_queryset(self):
+        return Message.objects.filter(owner=self.request.user)
+
+
+class NonPublishedNewslettersListView(ListView):
+    model = NewsLetter
+    context_object_name = 'non_published_newsletters'
+    template_name = 'mailwork/non_published_newsletters.html'
+
+    def get_queryset(self):
+        return Message.objects.filter(is_published=False)
