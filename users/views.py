@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 
-from .forms import UserCreationForm, CustomAuthenticationForm, UserProfileForm
+from .forms import CustomAuthenticationForm, UserProfileForm, UserCreateForm
 from .models import User
 
 from config.settings import EMAIL_HOST_USER
@@ -18,7 +18,7 @@ from config.settings import EMAIL_HOST_USER
 class RegisterView(CreateView):
     model = User
     template_name = 'users/register.html'
-    form_class = UserCreationForm
+    form_class = UserCreateForm
     success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
