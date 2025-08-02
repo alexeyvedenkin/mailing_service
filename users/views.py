@@ -16,6 +16,7 @@ from config.settings import EMAIL_HOST_USER
 
 
 class RegisterView(CreateView):
+    """ Контроллер для доступа к форме регистрации пользователя """
     model = User
     template_name = 'users/register.html'
     form_class = UserCreateForm
@@ -46,6 +47,7 @@ def email_verification(request, token):
 
 
 class CustomLoginView(LoginView):
+    """ Контроллер для доступа к форме аутентификации пользователя """
     authentication_form = CustomAuthenticationForm
     template_name = 'users/login.html'
 
@@ -64,6 +66,7 @@ def edit_profile(request):
 
 
 class ProfileSuccessView(TemplateView):
+    """ Контроллер для доступа сохранения обновленных данных пользователя """
     template_name = 'users/profile_success.html'
 
     def get_context_data(self, **kwargs):
@@ -73,6 +76,7 @@ class ProfileSuccessView(TemplateView):
 
 
 class EditProfileView(View):
+    """ Контроллер для доступа к форме обновления данных пользователя """
     def get(self, request):
         form = UserProfileForm(instance=request.user)  # Предполагая, что у вас есть форма
         return render(request, 'users/edit_profile.html', {'form': form})
