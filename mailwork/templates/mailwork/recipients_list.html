@@ -21,10 +21,12 @@
                 <td>{{ recipient.fullname }}</td> <!-- Выводим имя адресата -->
                 <td>{{ recipient.email }}</td> <!-- Выводим Email адресата -->
                 <td>{{ recipient.comment }}</td> <!-- Выводим комментарий адресата -->
-                <td>
-                    <a type="button" class="btn btn-outline-danger"
-                       href="{% url 'mailwork:recipient_delete' recipient.pk %}">Удалить</a>
-                </td>
+                {% if perms.mailwork.can_unpublish_message %}
+                    <td>
+                        <a type="button" class="btn btn-outline-danger"
+                           href="{% url 'mailwork:recipient_delete' recipient.pk %}">Удалить</a>
+                    </td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
