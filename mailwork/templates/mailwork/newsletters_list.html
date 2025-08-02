@@ -3,5 +3,51 @@
 {% block title %}Пример Шаблона{% endblock %}
 
 {% block content %}
-    <h1 style="font-size: 2.5em;">Шаблон {{ request.path|slice:':-5' }} в разработке</h1>
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Наши рассылки</h1>
+</div>
+<div class="container">
+    {% if user.is_authenticated %}
+    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+          href="{% url 'mailwork:newsletters_list' %}">Рассылки</a></p>
+    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+          href="{% url 'mailwork:newsletter_create' %}">Добавить рассылку</a></p>
+    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+          href="{% url 'mailwork:user_owner_newsletters' %}">Мои рассылки</a></p>
+    {% endif %}
+    {% if perms.catalog.can_unpublish_product %}
+        <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+            href="{% url 'mailwork:non_published_newsletters' %}">Неопубликованные рассылки</a></p>
+    {% endif %}
+    <div class="row text-center">
+        {% for product in products %}
+        <div class="col-3">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">{{ newsletter.theme }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <h3 class="card-title pricing-card-title">{{ newsletter.theme }} р.</h3>
+                        <div class="col-2"></div>
+                        <div class="col-8">
+                            {% if user.is_authenticated %}
+                                <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
+                                    href="{% url 'mailwork:newsletter_detail' newsletter.pk %}">Подробнее</a>
+                                {% if perms.mailwork.can_unpublish_message %}
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-danger w-100"
+                                        href="{% url 'mailwork:newsletter_delete' newsletter.pk %}">Удалить</a>
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-success w-100"
+                                        href="{% url 'mailwork:unpublish_newsletter' newsletter.pk %}">Удалить из рассылки</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
