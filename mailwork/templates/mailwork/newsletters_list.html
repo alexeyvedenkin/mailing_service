@@ -23,12 +23,12 @@
         <tbody>
             {% for newsletter in newsletters %}
             <tr>
-                <td>{{ newsletter.owner }}</td> <!-- Выводим имя адресата -->
-                <td>{{ newsletter.status }}</td> <!-- Выводим Email адресата -->
-                <td>{{ newsletter.first_send_time }}</td> <!-- Выводим комментарий адресата -->
-                <td>{{ newsletter.last_send_time }}</td> <!-- Выводим комментарий адресата -->
-                <td>{{ newsletter.message }}</td> <!-- Выводим комментарий адресата -->
-                <td>{{ newsletter.recipients }}</td> <!-- Выводим комментарий адресата -->
+                <td>{{ newsletter.owner }}</td> <!-- Выводим владельца рассылки-->
+                <td>{{ newsletter.status }}</td> <!-- Выводим статус рассылки -->
+                <td>{{ newsletter.first_send_time }}</td> <!-- Выводим дату первой отправки рассылки -->
+                <td>{{ newsletter.last_send_time }}</td> <!-- Выводим дату последней отправки рассылки -->
+                <td>{{ newsletter.message }}</td> <!-- Выводим тему сообщения из рассылки -->
+                <td>{{ newsletter.recipients }}</td> <!-- Выводим список адресатов -->
                 {% if perms.mailwork.can_unpublish_newsletter %}
                     {% if newsletter.status == "created" %}
                         <td>
