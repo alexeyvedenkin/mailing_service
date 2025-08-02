@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    """ Класс для работы с моделью пользователя """
     email = models.EmailField(unique=True, verbose_name='Email')
     phone_number = models.CharField(max_length=15, verbose_name='Телефон', blank=True, null=True)
     avatar = models.ImageField(upload_to='users/avatars/', verbose_name='Аватар', blank=True, null=True)
