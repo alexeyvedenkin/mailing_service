@@ -25,6 +25,7 @@ class Message(models.Model):
     """ Определяет параметры модели сообщения """
     theme = models.CharField(max_length=100, verbose_name="Тема письма")
     content = models.TextField(verbose_name="Содержание письма")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец", default=1)
 
     class Meta:
         verbose_name = "Письмо"
