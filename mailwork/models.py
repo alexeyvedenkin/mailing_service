@@ -55,6 +55,33 @@ class NewsLetter(models.Model):
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
 
+    def total_attempts(self):
+        """ Подсчет общего количества попыток рассылки для этой рассылки """
+        return SendingAttempt.objects.filter(newsletter=self).count()
+
+    def successful_attempts(self):
+        """ Подсчет количества успешных попыток """
+        return SendingAttempt.objects.filter(newsletter=self, status='success').count()
+
+    def failed_attempts(self):
+        """ Подсчет количества неудачных попыток """
+        return SendingAttempt.objects.filter(newsletter=self, status='failure').count()
+
+    @classmethod
+    def overall_statistics(cls):
+        """ Получение общей статистики по всем рассылкам """
+        total_newsletters = cls.objects.count()  # Общее количество рассылок
+        total_attempts = SendingAttempt.objects.count()  # Общее количество попыток
+        successful_attempts = SendingAttempt.objects.filter(status='success').count()  # Успешные попытки
+        failed_attempts = SendingAttempt.objects.filter(status='failure').count()  # Неудачные попытки
+
+        return {
+            'total_newsletters': total_newsletters,
+            'total_attempts': total_attempts,
+            'successful_attempts': successful_attempts,
+            'failed_attempts': failed_attempts,
+        }
+
 
 class SendingAttempt(models.Model):
     """ Определяет параметры модели попытки рассылки """
