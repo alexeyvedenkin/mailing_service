@@ -55,6 +55,11 @@ class NewsLetter(models.Model):
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
 
+    def get_status_display(self):
+        """ Метод, возвращающий текст статуса """
+        status_dict = dict(self.STATUS_CHOICES)
+        return status_dict.get(self.status, self.status)
+
     def total_attempts(self):
         """ Подсчет общего количества попыток рассылки для этой рассылки """
         return SendingAttempt.objects.filter(newsletter=self).count()
