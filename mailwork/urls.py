@@ -5,7 +5,7 @@ from mailwork.views import RecipientListView, RecipientDetailView, RecipientCrea
     RecipientDeleteView, HomeTemplateView, MessageListView, MessageCreateView, MessageUpdateView, MessageDetailView, \
     MessageDeleteView, NewsLetterListView, NewsLetterCreateView, NewsLetterUpdateView, NewsLetterDetailView, \
     NewsLetterDeleteView, UserOwnedMessageListView, NonPublishedMessageListView, publish_message, unpublish_message, \
-    UserOwnerNewslettersListView, NonPublishedNewslettersListView, newsletter_start
+    UserOwnerNewslettersListView, NonPublishedNewslettersListView, newsletter_start, newsletter_finish
 
 app_name = MailworkConfig.name
 
@@ -39,6 +39,6 @@ urlpatterns = [
     path("newsletter/<int:pk>/delete/", NewsLetterDeleteView.as_view(), name="newsletter_delete"),
 
     path("newsletter/start/<int:pk>/", newsletter_start, name="newsletter_start"),  # Замените на функцию
-    path("newsletter/finish/<int:pk>/", NewsLetterUpdateView.as_view(), name="newsletter_finish"),
+    path("newsletter/finish/<int:pk>/", newsletter_finish, name="newsletter_finish"),
 
 ]
