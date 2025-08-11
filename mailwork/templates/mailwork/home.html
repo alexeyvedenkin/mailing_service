@@ -12,11 +12,11 @@
     </div>
 </header>
 <div class="container">
-    <div class="row text-center">
-        {{ total_newsletters }}
-        {{ total_attempts }}
-        {{ successful_attempts }}
-        {{ failed_attempts }}
+    <div class="row text-left"> <!-- Изменено на text-left для выравнивания по левому краю -->
+        <p class="lead" style="font-weight: bold; font-size: 14px;">Всего рассылок: {{ total_newsletters }}</p>
+        <p class="lead" style="font-weight: bold; font-size: 14px;">Всего попыток рассылок: {{ total_attempts }}</p>
+        <p class="lead" style="font-weight: bold; font-size: 14px;">Успешные попытки: {{ successful_attempts }}</p>
+        <p class="lead" style="font-weight: bold; font-size: 14px;">Неудачные попытки: {{ failed_attempts }}</p>
     </div>
 </div>
 {% endblock %}
