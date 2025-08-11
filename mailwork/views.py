@@ -279,4 +279,13 @@ def footer_view(request):
     # Получаем статистику
     statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
 
+    if statistics is None:
+        # Обработка случая, когда статистика отсутствует
+        statistics = {
+            'total_newsletters': 0,
+            'total_attempts': 0,
+            'successful_attempts': 0,
+            'failed_attempts': 0,
+        }  # Устанавливаем значения по умолчанию
+
     return render(request, 'mailwork/includes/inc_footer.html', {'statistics': statistics})

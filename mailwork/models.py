@@ -88,17 +88,26 @@ class NewsLetter(models.Model):
     @classmethod
     def overall_statistics(cls):
         """ Получение общей статистики по всем рассылкам """
-        total_newsletters = cls.objects.count()  # Общее количество рассылок
-        total_attempts = SendingAttempt.objects.count()  # Общее количество попыток
-        successful_attempts = SendingAttempt.objects.filter(status='success').count()  # Успешные попытки
-        failed_attempts = SendingAttempt.objects.filter(status='failure').count()  # Неудачные попытки
+        try:
+            total_newsletters = cls.objects.count()  # Общее количество рассылок
+            total_attempts = SendingAttempt.objects.count()  # Общее количество попыток
+            successful_attempts = SendingAttempt.objects.filter(status='success').count()  # Успешные попытки
+            failed_attempts = SendingAttempt.objects.filter(status='failure').count()  # Неудачные попытки
 
-        return {
-            'total_newsletters': total_newsletters,
-            'total_attempts': total_attempts,
-            'successful_attempts': successful_attempts,
-            'failed_attempts': failed_attempts,
-        }
+            return {
+                'total_newsletters': total_newsletters,
+                'total_attempts': total_attempts,
+                'successful_attempts': successful_attempts,
+                'failed_attempts': failed_attempts,
+            }
+        except Exception as e:
+            print(f"Ошибка: {e}")  # Выводим ошибку в консоль
+            return {  # Возвращаем пустые значения вместо None
+                'total_newsletters': 0,
+                'total_attempts': 0,
+                'successful_attempts': 0,
+                'failed_attempts': 0,
+            }
 
     def get_newsletter_info(self):
         """ Получение информации о состоянии всех полей рассылки """

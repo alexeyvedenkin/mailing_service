@@ -1,31 +1,19 @@
 <footer class="pt-4 my-md-5 pt-md-5 border-top">
-        <div class="row">
-            <div class="col-12 col-md" style="font-weight: bold">
-                Mailing Service
-                <small class="d-block mb-3 text-muted">&copy; 2025</small>
-            </div>
-            <div class="col-6 col-md">
-                <h5>Категории</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="#">Рассылки</a></li>
-                    <li><a class="text-muted" href="#">Телеграм боты</a></li>
-                    <li><a class="text-muted" href="#">Полезные утилиты</a></li>
-                    <li><a class="text-muted" href="#">Веб-приложения</a></li>
-                    <li><a class="text-muted" href="#">Микросервисы</a></li>
-                </ul>
-            </div>
-            <div class="col-6 col-md">
-                <h5>Дополнительно</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="blog/article_list">Мы пишем</a></li>
-                </ul>
-            </div>
-            <div class="col-6 col-md">
-                <h5>О нас</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="/contacts/">Контакты</a></li>
-                </ul>
-            </div>
+    <div class="row">
+        <div class="col-12 col-md" style="font-weight: bold">
+            Mailing Service
+            <small class="d-block mb-3 text-muted">&copy; 2025</small>
         </div>
-    </footer>
-</div>
+        <div class="col-6 col-md">
+        <h5>Статистика</h5>
+            <p>Всего рассылок: {{ statistics.total_newsletters }}</p>
+            <p>Всего попыток: {{ statistics.total_attempts }}</p>
+            <p>Успешные попытки: {{ statistics.successful_attempts }}</p>
+            <p>Неудачные попытки: {{ statistics.failed_attempts }}</p>
+        </div>
+        <div class="col-6 col-md">
+            <div class="col-6 col-md">
+            <h4>Ваша рассылка найдет своего адресата</h4>
+        </div>
+    </div>
+</footer>
