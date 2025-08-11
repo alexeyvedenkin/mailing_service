@@ -17,32 +17,47 @@
                 <th>Дата последней отправки</th>
                 <th>Сообщение</th>
                 <th>Адресаты</th>
+                <th>Всего попыток</th> <!-- Поле для общего количества попыток -->
+                <th>Успешные попытки</th> <!-- Поле для успешных попыток -->
+                <th>Неудачные попытки</th> <!-- Поле для неудачных попыток -->
                 <th>Доступные действия</th>
             </tr>
         </thead>
         <tbody>
             {% for newsletter in newsletters %}
             <tr>
-                <td>{{ newsletter.owner }}</td> <!-- Выводим владельца рассылки-->
+                <td>{{ newsletter.owner }}</td> <!-- Выводим владельца рассылки -->
                 <td>{{ newsletter.get_status_display }}</td> <!-- Выводим статус рассылки -->
                 <td>{{ newsletter.first_send_time }}</td> <!-- Выводим дату первой отправки рассылки -->
                 <td>{{ newsletter.last_send_time }}</td> <!-- Выводим дату последней отправки рассылки -->
                 <td>{{ newsletter.message }}</td> <!-- Выводим тему сообщения из рассылки -->
-                <td>{{ newsletter.recipients }}</td> <!-- Выводим список адресатов -->
+                <td>
+                    {% for recipient in newsletter.recipients.all %} <!-- Цикл по всем адресатам -->
+                        {{ recipient }}{% if not forloop.last %}, {% endif %} <!-- Объединяем адресаты через запятую -->
+                    {% endfor %}
+                </td>
+                <td>{{ newsletter.total_attempts }}</td> <!-- Отображаем общее количество попыток -->
+                <td>{{ newsletter.successful_attempts }}</td> <!-- Отображаем количество успешных попыток -->
+                <td>{{ newsletter.failed_attempts }}</td> <!-- Отображаем количество неудачных попыток -->
                 {% if perms.mailwork.can_unpublish_newsletter %}
-                    {% if newsletter.status == "created" %}
-                        <td>
-                            <a type="button" class="btn btn-outline-primary"
-                               href="{% url 'mailwork:newsletter_start' newsletter.pk %}">Запустить</a>
-                            <a type="button" class="btn btn-outline-danger"
-                               href="{% url 'mailwork:newsletter_finish' newsletter.pk %}">Завершить</a>
+                    <td>
+                        {% if newsletter.status == "created" %}
+                            <form action="{% url 'mailwork:newsletter_start' newsletter.pk %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-primary">Запустить</button>
+                            </form>
+                            <form action="{% url 'mailwork:newsletter_finish' newsletter.pk %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">Завершить</button>
+                            </form>
                         </td>
-                    {% elif newsletter.status == "started" %}
-                        <td>
-                            <a type="button" class="btn btn-outline-danger"
-                               href="{% url 'mailwork:newsletter_finish' newsletter.pk %}">Завершить</a>
-                        </td>
-                    {% endif %}
+                        {% elif newsletter.status == "started" %}
+                            <form action="{% url 'mailwork:newsletter_finish' newsletter.pk %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">Завершить</button>
+                            </form>
+                        {% endif %}
+                    </td>
                 {% endif %}
             </tr>
             {% endfor %}
@@ -57,35 +72,5 @@
         <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
             href="{% url 'mailwork:non_published_newsletters' %}">Неопубликованные рассылки</a></p>
     {% endif %}
-    <div class="row text-center">
-        {% for product in products %}
-        <div class="col-3">
-            <div class="card mb-4 box-shadow">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">{{ newsletter.theme }}</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <h3 class="card-title pricing-card-title">{{ newsletter.theme }} р.</h3>
-                        <div class="col-2"></div>
-                        <div class="col-8">
-                            {% if user.is_authenticated %}
-                                <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
-                                    href="{% url 'mailwork:newsletter_detail' newsletter.pk %}">Подробнее</a>
-                                {% if perms.mailwork.can_unpublish_message %}
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-danger w-100"
-                                        href="{% url 'mailwork:newsletter_delete' newsletter.pk %}">Удалить</a>
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-success w-100"
-                                        href="{% url 'mailwork:unpublish_newsletter' newsletter.pk %}">Удалить из рассылки</a>
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                        <div class="col-2"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 </div>
 {% endblock %}
