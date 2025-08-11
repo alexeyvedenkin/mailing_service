@@ -41,7 +41,7 @@
                 <td>{{ newsletter.failed_attempts }}</td> <!-- Отображаем количество неудачных попыток -->
                 {% if perms.mailwork.can_unpublish_newsletter %}
                     <td>
-                        {% if newsletter.status == "created" %}
+                        {% if newsletter.status != "completed" %}
                             <form action="{% url 'mailwork:newsletter_start' newsletter.pk %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-outline-primary">Запустить</button>
@@ -51,11 +51,6 @@
                                 <button type="submit" class="btn btn-outline-danger">Завершить</button>
                             </form>
                         </td>
-                        {% elif newsletter.status == "started" %}
-                            <form action="{% url 'mailwork:newsletter_finish' newsletter.pk %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger">Завершить</button>
-                            </form>
                         {% endif %}
                     </td>
                 {% endif %}
