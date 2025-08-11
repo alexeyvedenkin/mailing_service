@@ -13,19 +13,10 @@
 </header>
 <div class="container">
     <div class="row text-center">
-        {% for product in products %}
-        <div class="col-3">
-            <div class="card mb-4 box-shadow">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">{{ message.theme }}</h4>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title pricing-card-title">{{ message.description|truncatewords:10 }}</h3>
-                    <a type="button" class="btn btn-lg btn-block btn-outline-primary" href="{% url 'mailwork:message_detail' message.pk %}">Подробнее</a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+        {{ total_newsletters }}
+        {{ total_attempts }}
+        {{ successful_attempts }}
+        {{ failed_attempts }}
     </div>
 </div>
 {% endblock %}
