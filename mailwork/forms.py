@@ -65,26 +65,48 @@ class MessageForm(forms.ModelForm):
 
 
 class NewsLetterForm(forms.ModelForm):
-    """ Форма для создания или редактирования рассылки. """
+    new_recipient_email = forms.EmailField(
+        required=False,
+        label="Новый адресат",
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите email нового адресата'
+        })
+    )
+
+    recipients = forms.ModelMultipleChoiceField(
+        queryset=Recipient.objects.all(),  # Получаем всех получателей
+        widget=forms.CheckboxSelectMultiple,  # Используем чекбоксы для выбора
+        required=False
+    )  # Добавляем виджет для выбора адресатов
+
     class Meta:
-        model = NewsLetter  # Указываем модель для связи с формой
+        model = NewsLetter
         fields = [
-            "message",      # Сообщение для рассылки (ForeignKey)
-            "recipients",   # Получатели рассылки (ManyToManyField)
-            "first_send_time",  # Дата и время первой отправки
-            "last_send_time",   # Дата и времени последней отправки
-            "status",       # Статус рассылки
+            "message",
+            "recipients",
+            "status",
         ]
 
     def __init__(self, *args, **kwargs):
         super(NewsLetterForm, self).__init__(*args, **kwargs)
 
+        # Добавляем классы для стиля
         self.fields['message'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Введите сообщение для рассылки'
         })
 
-        self.fields['recipients'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Добавьте адресатов рассылки'
-        })
+    def clean(self):
+        """ Метод для обработки нового адресата """
+        cleaned_data = super().clean()
+        new_email = cleaned_data.get("new_recipient_email")
+
+        # Если введен новый email, добавляем его в модель Recipient
+        if new_email:
+            # Создаем нового адресата и добавляем его к получателям
+            recipient, created = Recipient.objects.get_or_create(email=new_email)
+            # Добавляем нового адресата в выбор получателей
+            cleaned_data['recipients'].add(recipient)
+
+        return cleaned_data  # Возвращаем очищенные данные

@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages  # Импортируем для отображения сообщений
+from django.core.exceptions import ValidationError
+from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -13,6 +16,7 @@ from django.views.generic import (
 
 from mailwork.forms import RecipientForm, MessageForm, NewsLetterForm
 from mailwork.models import Message, NewsLetter, Recipient, SendingAttempt
+from datetime import datetime  # Импортируем datetime для работы с временем
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
@@ -111,6 +115,21 @@ class NewsLetterCreateView(LoginRequiredMixin, CreateView):
     template_name = 'mailwork/newsletter_form.html'
     success_url = reverse_lazy("mailwork:newsletters_list")
 
+    def form_valid(self, form):
+        # Создаем объект рассылки, но не сохраняем в базе данных
+        newsletter = form.save(commit=False)
+        # Устанавливаем владельца рассылки (текущий пользователь)
+        newsletter.owner = self.request.user
+
+        # Сохраняем объект рассылки в базе данных
+        newsletter.save()
+
+        # Если форма уже содержит получателей, не забудьте их установить
+        for recipient in form.cleaned_data.get('recipients', []):
+            newsletter.recipients.add(recipient)
+
+        return super().form_valid(form)
+
 
 class NewsLetterDetailView(LoginRequiredMixin, DetailView):
     """ Контроллер для отображения экземпляра класса NewsLetter """
@@ -121,10 +140,26 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
     """ Контроллер для редактирования экземпляра класса NewsLetter """
     model = NewsLetter
     form_class = NewsLetterForm
-    template_name = 'mailwork/newsletters_form.html'
+    template_name = 'mailwork/newsletter_update.html'  # Исправьте путь к шаблону, если требуется
     success_url = reverse_lazy("mailwork:newsletters_list")
 
-    # def newsletter_start(self):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()  # Получение текущего объекта
+        # Логика для "запуска" или "завершения" рассылки.
+        # Пример:
+        if 'start' in request.POST:
+            self.object.start()
+        elif 'finish' in request.POST:
+            self.object.finish()
+
+        # Попытка сохранить объект и обработка ошибок
+        try:
+            self.object.save()
+            return super().form_valid(self.get_form())
+        except ValueError as e:
+            print(f"Ошибка сохранения: {e}")  # Печать ошибки для отладки
+            # Убедитесь, что форма будет невалидной и передаем ошибки
+            return self.form_invalid(self.get_form())
 
 
 class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
@@ -180,13 +215,68 @@ class SendingAttemptCreateView(LoginRequiredMixin, CreateView):
     template_name = 'mailwork/newsletter_start.html'
 
 
-# class NewsLetterStart(LoginRequiredMixin):
-#     model = NewsLetter
-#     context_object_name = 'newsletter_start'
-#     template_name = 'mailwork/newsletter_start.html'
-#
-#
-# class NewsLetterFinish(LoginRequiredMixin):
-#     model = NewsLetter
-#     context_object_name = 'newsletter_finish'
-#     template_name = 'mailwork/newsletter_finish.html'
+# Обработчик для запуска рассылки
+def newsletter_start(request, pk):
+    newsletter = get_object_or_404(NewsLetter, pk=pk)
+
+    if request.method == 'POST':
+        print(f"Получен POST-запрос для рассылки с pk={pk}")
+        try:
+            if newsletter.status != 'started':
+                newsletter.status = 'started'
+                current_time = timezone.now()  # Используем правильный метод для получения текущего времени
+                newsletter.first_send_time = current_time
+                newsletter.last_send_time = current_time
+                newsletter.save()
+
+                sending_attempt = SendingAttempt(newsletter=newsletter)
+                sending_attempt.attempt_time = current_time  # Устанавливаем текущее время для attempt_time
+
+                try:
+                    sending_attempt.send_newsletter(request.user)  # Попытка отправки
+                    sending_attempt.status = 'success'  # Успех
+                    messages.success(request, 'Рассылка успешно начата!')
+                except Exception as e:  # Ловим исключения при отправке
+                    sending_attempt.status = 'failure'  # Неудача
+                    sending_attempt.server_response = str(e)  # Сохраняем сообщение об ошибке
+                    messages.error(request, 'Ошибка при отправке рассылки!')
+
+                sending_attempt.save()  # Сохраняем попытку в БД
+                return redirect('mailwork:newsletters_list')
+            else:
+                messages.warning(request, 'Рассылка уже запущена!')
+        except Exception as e:
+            messages.error(request, f'Ошибка при запуске рассылки: {str(e)}')
+
+    return redirect('mailwork:newsletters_list')
+
+# Обработчик для завершения рассылки
+def newsletter_finish(request, pk):
+    newsletter = get_object_or_404(NewsLetter, pk=pk)
+
+    if request.method == 'POST':  # Проверяем, что это POST-запрос
+        try:
+            newsletter.status = 'completed'  # Меняем статус на "Завершена"
+            print(newsletter.__dict__)  # Выводим все поля объекта перед валидацией
+            newsletter.full_clean()  # Проверяем валидацию данных перед сохранением
+            newsletter.save()  # Сохраняем изменения
+            messages.success(request, 'Рассылка успешно завершена!')  # Успешное сообщение
+        except Exception as e:
+            # Добавьте информацию об ошибках валидации
+            errors = ''
+            if hasattr(e, 'error_list'):  # Проверка наличия ошибок валидации
+                # Обрабатываем ошибки валидации
+                errors = ', '.join([str(error) for error in e.error_list])
+            else:
+                # Если ошибка не валидации, просто выводим ее
+                errors = str(e)
+            messages.error(request, f'Ошибка при завершении рассылки: {errors}')  # Сообщение об ошибке
+
+    return redirect('mailwork:newsletters_list')  # Возврат на страницу списка рассылок
+
+
+def footer_view(request):
+    # Получаем статистику
+    statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
+
+    return render(request, 'mailwork/includes/inc_footer.html', {'statistics': statistics})
