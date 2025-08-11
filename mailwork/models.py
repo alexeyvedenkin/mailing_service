@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 
+from config.settings import DEFAULT_FROM_EMAIL
 from users.models import User
 
 
@@ -172,8 +173,8 @@ class SendingAttempt(models.Model):
                 send_mail(
                     self.newsletter.message.theme,  # type: ignore
                     self.newsletter.message.content,  # type: ignore
-                    user.email,  # email экземпляра User
-                    [email],
+                    from_email=DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
                     fail_silently=False,
                 )
                 # Если успех, сохраняем попытку
