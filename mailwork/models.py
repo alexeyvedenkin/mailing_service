@@ -1,7 +1,6 @@
-from datetime import timezone
-
 from django.core.mail import send_mail
 from django.db import models
+from django.utils import timezone
 
 from users.models import User
 
@@ -44,7 +43,7 @@ class NewsLetter(models.Model):
         ('completed', 'Завершена'),
     ]
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец", default=1)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец")
     first_send_time = models.DateTimeField(verbose_name="Дата и время первой отправки", null=True)
     last_send_time = models.DateTimeField(verbose_name="Дата и время последней отправки", null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, verbose_name="Статус", default='created')
@@ -54,6 +53,20 @@ class NewsLetter(models.Model):
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
+
+    def start(self):
+        """ Запускает рассылку и устанавливает время первого отправления. """
+        if self.status == 'created':
+            self.first_send_time = timezone.now()  # Устанавливаем текущее время
+            self.status = 'started'  # Изменяем статус на 'started'
+            self.save()  # Сохраняем изменения
+
+    def complete(self):
+        """ Завершает рассылку и устанавливает время последней отправки. """
+        if self.status in ['created', 'started']:
+            self.last_send_time = timezone.now()  # Устанавливаем текущее время
+            self.status = 'completed'  # Изменяем статус на 'completed'
+            self.save()  # Сохраняем изменения
 
     def get_status_display(self):
         """ Метод, возвращающий текст статуса """
@@ -86,6 +99,43 @@ class NewsLetter(models.Model):
             'successful_attempts': successful_attempts,
             'failed_attempts': failed_attempts,
         }
+
+    def get_newsletter_info(self):
+        """ Получение информации о состоянии всех полей рассылки """
+        # Формируем информацию о рассылке
+
+        # Получаем всех получателей
+        recipients_list = self.recipients.all()  # Изменено: получаем список всех получателей
+
+        info = {
+            'owner': self.owner.id,
+            'first_send_time': self.first_send_time,
+            'last_send_time': self.last_send_time,
+            'status': self.get_status_display(),  # Используем метод для отображения статуса
+            'message': self.message.content,  # Содержимое сообщения
+            'recipients_count': len(recipients_list),  # Теперь используем количество получателей из списка
+            'recipients_emails': [recipient.email for recipient in recipients_list],  # Получаем emails
+        }
+
+        # Вывод информации на консоль
+        print("Информация о рассылке:")
+        for key, value in info.items():
+            print(f"{key}: {value}")  # Выводим ключ и его значение
+
+        return info  # Возвращаем информацию о рассылке
+
+    # Метод для добавления существующего адресата
+    def add_recipient(self, recipient):
+        """Добавляет существующего адресата к рассылке."""
+        self.recipients.add(recipient)  # Добавляет адресата в ManyToMany поле
+        self.save()  # Сохраняет изменения
+
+    # Метод для создания и добавления нового адресата
+    def create_and_add_recipient(self, email):
+        """Создает нового адресата с заданным email и добавляет его к рассылке."""
+        new_recipient = Recipient.objects.create(email=email)  # Создает нового адресата
+        self.recipients.add(new_recipient)  # Добавляет нового адресата в рассылку
+        self.save()  # Сохраняет изменения
 
 
 class SendingAttempt(models.Model):
