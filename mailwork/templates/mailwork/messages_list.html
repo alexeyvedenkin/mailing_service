@@ -5,9 +5,35 @@
     <h1 class="display-4">Наши сообщения</h1>
 </div>
 <div class="container">
+    <!-- Добавляем таблицу для вывода сообщений -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Тема</th>
+                <th>Владелец</th>
+                <th>Содержание</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+            <tr>
+                <td>{{ message.theme }}</td> <!-- Выводим тему сообщения -->
+                <td>{{ message.owner }}</td> <!-- Выводим владельца сообщения -->
+                <td>{{ message.content|truncatechars:100 }}</td> <!-- Выводим краткое содержание сообщения -->
+                {% if perms.mailwork.can_unpublish_message %}
+                    <td>
+                        <a type="button" class="btn btn-outline-danger"
+                           href="{% url 'mailwork:message_delete' message.pk %}">Удалить</a>
+                    </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
     {% if user.is_authenticated %}
-    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
-          href="{% url 'mailwork:newsletters_list' %}">Рассылки</a></p>
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
           href="{% url 'mailwork:message_create' %}">Добавить сообщение</a></p>
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
