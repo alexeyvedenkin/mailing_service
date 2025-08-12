@@ -18,6 +18,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class NewsLetterAdmin(admin.ModelAdmin):
     list_display = ["first_send_time", "last_send_time", "status", "message"]
 
+
 @admin.register(SendingAttempt)
 class SendingAttemptAdmin(admin.ModelAdmin):
     list_display = ["attempt_time", "status", "server_response", "newsletter"]
