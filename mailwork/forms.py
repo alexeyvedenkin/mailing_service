@@ -1,6 +1,7 @@
+from typing import Any, Dict
+
 from django import forms
 from django.core.exceptions import ValidationError
-from typing import Any, Dict, List, Optional
 
 from .models import Message, NewsLetter, Recipient
 

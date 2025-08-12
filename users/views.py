@@ -1,10 +1,10 @@
 import secrets
-from typing import Any, Dict
+from typing import Any
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -26,7 +26,7 @@ class RegisterView(CreateView):
     success_url = reverse_lazy("users:login")
 
     def form_valid(self, form: UserCreateForm) -> HttpResponse:
-        """ Обработка валидной формы регистрации пользователя """
+        """Обработка валидной формы регистрации пользователя"""
         user = form.save()
         user.is_active = False
         token = secrets.token_hex(16)
@@ -44,7 +44,7 @@ class RegisterView(CreateView):
 
 
 def email_verification(request: Any, token: str) -> Any:
-    """ Метод для проверки email пользователя по токену """
+    """Метод для проверки email пользователя по токену"""
 
     user = get_object_or_404(User, token=token)
     user.is_active = True

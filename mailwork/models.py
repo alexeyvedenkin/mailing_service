@@ -61,39 +61,39 @@ class NewsLetter(models.Model):
         verbose_name_plural = "Рассылки"
 
     def start(self) -> None:
-        """ Запускает рассылку и устанавливает время первого отправления """
+        """Запускает рассылку и устанавливает время первого отправления"""
         if self.status == "created":
             self.first_send_time = timezone.now()  # Устанавливаем текущее время
             self.status = "started"  # Изменяем статус на 'started'
             self.save()  # Сохраняем изменения
 
     def complete(self) -> None:
-        """ Завершает рассылку и устанавливает время последней отправки """
+        """Завершает рассылку и устанавливает время последней отправки"""
         if self.status in ["created", "started"]:
             self.last_send_time = timezone.now()  # Устанавливаем текущее время
             self.status = "completed"  # Изменяем статус на 'completed'
             self.save()  # Сохраняем изменения
 
     def get_status_display(self) -> Any:
-        """ Метод, возвращающий текст статуса """
+        """Метод, возвращающий текст статуса"""
         status_dict = dict(self.STATUS_CHOICES)
         return status_dict.get(self.status, self.status)
 
     def total_attempts(self) -> Any:
-        """ Подсчет общего количества попыток рассылки для этой рассылки """
+        """Подсчет общего количества попыток рассылки для этой рассылки"""
         return SendingAttempt.objects.filter(newsletter=self).count()
 
     def successful_attempts(self) -> Any:
-        """ Подсчет количества успешных попыток """
+        """Подсчет количества успешных попыток"""
         return SendingAttempt.objects.filter(newsletter=self, status="success").count()
 
     def failed_attempts(self) -> Any:
-        """ Подсчет количества неудачных попыток """
+        """Подсчет количества неудачных попыток"""
         return SendingAttempt.objects.filter(newsletter=self, status="failure").count()
 
     @classmethod
     def overall_statistics(cls) -> Any:
-        """ Получение общей статистики по всем рассылкам """
+        """Получение общей статистики по всем рассылкам"""
         try:
             total_newsletters = cls.objects.count()  # Общее количество рассылок
             total_attempts = SendingAttempt.objects.count()  # Общее количество попыток
@@ -116,7 +116,7 @@ class NewsLetter(models.Model):
             }
 
     def get_newsletter_info(self) -> Any:
-        """ Получение информации о состоянии всех полей рассылки """
+        """Получение информации о состоянии всех полей рассылки"""
         # Формируем информацию о рассылке
 
         # Получаем всех получателей
@@ -141,20 +141,20 @@ class NewsLetter(models.Model):
 
     # Метод для добавления существующего адресата
     def add_recipient(self, recipient: Recipient) -> None:
-        """ Добавляет существующего адресата к рассылке """
+        """Добавляет существующего адресата к рассылке"""
         self.recipients.add(recipient)  # Добавляет адресата в ManyToMany поле
         self.save()  # Сохраняет изменения
 
     # Метод для создания и добавления нового адресата
     def create_and_add_recipient(self, email: str) -> None:
-        """ Создает нового адресата с заданным email и добавляет его к рассылке """
+        """Создает нового адресата с заданным email и добавляет его к рассылке"""
         new_recipient = Recipient.objects.create(email=email)  # Создает нового адресата
         self.recipients.add(new_recipient)  # Добавляет нового адресата в рассылку
         self.save()  # Сохраняет изменения
 
 
 class SendingAttempt(models.Model):
-    """ Определяет параметры модели попытки рассылки """
+    """Определяет параметры модели попытки рассылки"""
 
     attempt_time = models.DateTimeField(verbose_name="Дата и время попытки")
     status = models.CharField(
@@ -168,11 +168,11 @@ class SendingAttempt(models.Model):
         verbose_name_plural = "Попытки рассылок"
 
     def __str__(self) -> str:
-        """ Определяет формат вывода экземпляра класса SendingAttempt """
+        """Определяет формат вывода экземпляра класса SendingAttempt"""
         return f"Попытка: {self.attempt_time}, Статус: {self.status}"
 
     def send_newsletter(self, user: User) -> None:  # Добавляем параметр user
-        """ Инициализация отправки рассылки """
+        """Инициализация отправки рассылки"""
         recipients = self.newsletter.recipients.all()  # type: ignore
         for recipient in recipients:
             email = recipient.email  # email экземпляра Recipient
@@ -192,7 +192,7 @@ class SendingAttempt(models.Model):
                 self.create_attempt("failure", str(e))
 
     def create_attempt(self, status: str, response: str) -> None:
-        """ Создание записи о попытке рассылки """
+        """Создание записи о попытке рассылки"""
         SendingAttempt.objects.create(  # type: ignore
             attempt_time=timezone.now(),  # type: ignore
             status=status,

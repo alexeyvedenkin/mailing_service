@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    """ Команда для создания администратора """
+    """Команда для создания администратора"""
+
     def handle(self, *args: str, **options: dict) -> None:
         User = get_user_model()
         user = User.objects.create(

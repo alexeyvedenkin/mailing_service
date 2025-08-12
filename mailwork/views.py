@@ -1,11 +1,11 @@
-from typing import Any, Union, Dict
+from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
-from django.http import HttpResponse, HttpRequest
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
@@ -102,7 +102,7 @@ def publish_message(request: HttpRequest, message_id: int) -> HttpResponse:
 @login_required
 @permission_required("mailwork.can_unpublish_message", raise_exception=True)
 def unpublish_message(request: HttpRequest, message_id: int) -> HttpResponse:
-    """ Метод для изменения статуса сообщения """
+    """Метод для изменения статуса сообщения"""
     message = get_object_or_404(Message, pk=message_id)
     message.is_published = False
     message.save()
@@ -158,7 +158,7 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "mailwork/newsletter_update.html"  # Исправьте путь к шаблону, если требуется
     success_url = reverse_lazy("mailwork:newsletters_list")
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) ->HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         self.object = self.get_object()  # Получение текущего объекта
         # Логика для запуска или завершения рассылки
         if "start" in request.POST:
@@ -183,12 +183,12 @@ class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class HomeTemplateView(TemplateView):
-    """ Выполняет переход к главной странице """
+    """Выполняет переход к главной странице"""
 
     template_name = "mailwork/home.html"
 
     def get_context_data(self, **kwargs: Dict[str, Any]) -> Any:
-        """ Получает контекстные данные для главной страницы """
+        """Получает контекстные данные для главной страницы"""
         context = super().get_context_data(**kwargs)
 
         statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
@@ -208,46 +208,50 @@ class HomeTemplateView(TemplateView):
 
 
 class NonPublishedMessageListView(ListView):
-    """ Контроллер для отображения списка сообщений, не включенных в рассылки """
+    """Контроллер для отображения списка сообщений, не включенных в рассылки"""
+
     model = Message
     context_object_name = "non_published_messages"
     template_name = "mailwork/non_published_messages.html"
 
     def get_queryset(self) -> QuerySet:
-        """ Возвращает набор данных, содержащий список сообщений, не включенных в рассылки """
+        """Возвращает набор данных, содержащий список сообщений, не включенных в рассылки"""
         return Message.objects.filter(is_published=False)
 
 
 class UserOwnedMessageListView(LoginRequiredMixin, ListView):
-    """ Контроллер для отображения списка сообщений пользователя """
+    """Контроллер для отображения списка сообщений пользователя"""
+
     model = Message
     context_object_name = "owned_messages"
     template_name = "mailwork/user_owner_messages.html"
 
     def get_queryset(self) -> QuerySet:
-        """ Возвращает набор данных, содержащий только сообщения пользователя """
+        """Возвращает набор данных, содержащий только сообщения пользователя"""
         return Message.objects.filter(owner=self.request.user)
 
 
 class UserOwnerNewslettersListView(LoginRequiredMixin, ListView):
-    """ Контроллер для отображения списка рассылок пользователя """
+    """Контроллер для отображения списка рассылок пользователя"""
+
     model = NewsLetter
     context_object_name = "owned_newsletters"
     template_name = "mailwork/user_owner_newsletters.html"
 
     def get_queryset(self) -> QuerySet:
-        """ Возвращает набор данных, содержащий только рассылки пользователя """
+        """Возвращает набор данных, содержащий только рассылки пользователя"""
         return Message.objects.filter(owner=self.request.user)
 
 
 class NonPublishedNewslettersListView(ListView):
-    """ Контроллер для отображения списка незапущенных рассылок """
+    """Контроллер для отображения списка незапущенных рассылок"""
+
     model = NewsLetter
     context_object_name = "non_published_newsletters"
     template_name = "mailwork/non_published_newsletters.html"
 
     def get_queryset(self) -> QuerySet:
-        """ Возвращает набор данных, содержащий только незапущенные рассылки """
+        """Возвращает набор данных, содержащий только незапущенные рассылки"""
         return NewsLetter.objects.filter(is_published=False)
 
 
