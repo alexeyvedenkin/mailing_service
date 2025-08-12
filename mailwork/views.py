@@ -1,6 +1,10 @@
+from typing import Any, Union, Dict
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import QuerySet
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -88,7 +92,7 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
 
 @login_required
 @permission_required("mailwork.can_unpublish_message", raise_exception=True)
-def publish_message(request, message_id):
+def publish_message(request: HttpRequest, message_id: int) -> HttpResponse:
     message = get_object_or_404(Message, pk=message_id)
     message.is_published = True
     message.save()
@@ -97,7 +101,8 @@ def publish_message(request, message_id):
 
 @login_required
 @permission_required("mailwork.can_unpublish_message", raise_exception=True)
-def unpublish_message(request, message_id):
+def unpublish_message(request: HttpRequest, message_id: int) -> HttpResponse:
+    """ Метод для изменения статуса сообщения """
     message = get_object_or_404(Message, pk=message_id)
     message.is_published = False
     message.save()
@@ -120,7 +125,7 @@ class NewsLetterCreateView(LoginRequiredMixin, CreateView):
     template_name = "mailwork/newsletter_form.html"
     success_url = reverse_lazy("mailwork:newsletters_list")
 
-    def form_valid(self, form):
+    def form_valid(self, form: NewsLetterForm) -> Any:
         """Метод для валидации данных в форме"""
         # Создаем объект рассылки, но не сохраняем в базе данных
         newsletter = form.save(commit=False)
@@ -153,7 +158,7 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "mailwork/newsletter_update.html"  # Исправьте путь к шаблону, если требуется
     success_url = reverse_lazy("mailwork:newsletters_list")
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) ->HttpResponse:
         self.object = self.get_object()  # Получение текущего объекта
         # Логика для запуска или завершения рассылки
         if "start" in request.POST:
@@ -178,11 +183,12 @@ class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class HomeTemplateView(TemplateView):
-    """Выполняет переход к главной странице"""
+    """ Выполняет переход к главной странице """
 
     template_name = "mailwork/home.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Dict[str, Any]) -> Any:
+        """ Получает контекстные данные для главной страницы """
         context = super().get_context_data(**kwargs)
 
         statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
@@ -202,39 +208,47 @@ class HomeTemplateView(TemplateView):
 
 
 class NonPublishedMessageListView(ListView):
+    """ Контроллер для отображения списка сообщений, не включенных в рассылки """
     model = Message
     context_object_name = "non_published_messages"
     template_name = "mailwork/non_published_messages.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """ Возвращает набор данных, содержащий список сообщений, не включенных в рассылки """
         return Message.objects.filter(is_published=False)
 
 
 class UserOwnedMessageListView(LoginRequiredMixin, ListView):
+    """ Контроллер для отображения списка сообщений пользователя """
     model = Message
     context_object_name = "owned_messages"
     template_name = "mailwork/user_owner_messages.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """ Возвращает набор данных, содержащий только сообщения пользователя """
         return Message.objects.filter(owner=self.request.user)
 
 
 class UserOwnerNewslettersListView(LoginRequiredMixin, ListView):
+    """ Контроллер для отображения списка рассылок пользователя """
     model = NewsLetter
     context_object_name = "owned_newsletters"
     template_name = "mailwork/user_owner_newsletters.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """ Возвращает набор данных, содержащий только рассылки пользователя """
         return Message.objects.filter(owner=self.request.user)
 
 
 class NonPublishedNewslettersListView(ListView):
+    """ Контроллер для отображения списка незапущенных рассылок """
     model = NewsLetter
     context_object_name = "non_published_newsletters"
     template_name = "mailwork/non_published_newsletters.html"
 
-    def get_queryset(self):
-        return Message.objects.filter(is_published=False)
+    def get_queryset(self) -> QuerySet:
+        """ Возвращает набор данных, содержащий только незапущенные рассылки """
+        return NewsLetter.objects.filter(is_published=False)
 
 
 class SendingAttemptCreateView(LoginRequiredMixin, CreateView):
@@ -243,7 +257,7 @@ class SendingAttemptCreateView(LoginRequiredMixin, CreateView):
     template_name = "mailwork/newsletter_start.html"
 
 
-def newsletter_start(request, pk):
+def newsletter_start(request: HttpRequest, pk: int) -> HttpResponse:
     """Обработчик для запуска рассылки"""
     newsletter = get_object_or_404(NewsLetter, pk=pk)
 
@@ -285,7 +299,7 @@ def newsletter_start(request, pk):
         return redirect("mailwork:newsletters_list")  # В этом случае тоже надо вернуть редирект
 
 
-def newsletter_finish(request, pk):
+def newsletter_finish(request: HttpRequest, pk: int) -> HttpResponse:
     """Обработчик для завершения рассылки"""
     newsletter = get_object_or_404(NewsLetter, pk=pk)
 
@@ -307,19 +321,3 @@ def newsletter_finish(request, pk):
             messages.error(request, f"Ошибка при завершении рассылки: {errors}")  # Сообщение об ошибке
 
     return redirect("mailwork:newsletters_list")  # Возврат на страницу списка рассылок
-
-
-def footer_view(request):
-    # Получаем статистику
-    statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
-
-    if statistics["total_newsletters"] == 0 and statistics["total_attempts"] == 0:
-        # Обработка случая, когда статистика отсутствует
-        statistics = {
-            "total_newsletters": 0,
-            "total_attempts": 0,
-            "successful_attempts": 0,
-            "failed_attempts": 0,
-        }  # Устанавливаем значения по умолчанию
-
-    return render(request, "mailwork/includes/inc_footer.html", {"statistics": statistics})

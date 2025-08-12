@@ -5,10 +5,11 @@ from users.models import User
 
 
 class Command(BaseCommand):
+    """ Класс для отправки рассылки вручную """
     help = "Отправляет рассылку вручную"
 
-    def handle(self, *args, **options):
-        # Здесь можно реализовать логику для выбора рассылки
+    def handle(self, *args: tuple, **options: dict) -> None:
+        """ Метод, который выполняет логику отправки рассылки """
         newsletter = NewsLetter.objects.first()  # Например, берем первую рассылку
         if newsletter:
             attempt = SendingAttempt(newsletter=newsletter)

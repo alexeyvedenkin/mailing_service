@@ -1,8 +1,10 @@
 import secrets
+from typing import Any, Dict
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -23,7 +25,8 @@ class RegisterView(CreateView):
     form_class = UserCreateForm
     success_url = reverse_lazy("users:login")
 
-    def form_valid(self, form):
+    def form_valid(self, form: UserCreateForm) -> HttpResponse:
+        """ Обработка валидной формы регистрации пользователя """
         user = form.save()
         user.is_active = False
         token = secrets.token_hex(16)
@@ -40,7 +43,9 @@ class RegisterView(CreateView):
         return super().form_valid(form)
 
 
-def email_verification(request, token):
+def email_verification(request: Any, token: str) -> Any:
+    """ Метод для проверки email пользователя по токену """
+
     user = get_object_or_404(User, token=token)
     user.is_active = True
     user.save()
@@ -55,7 +60,7 @@ class CustomLoginView(LoginView):
 
 
 @login_required
-def edit_profile(request):
+def edit_profile(request: HttpRequest) -> HttpResponse:
     user = request.user
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=user)
@@ -72,7 +77,7 @@ class ProfileSuccessView(TemplateView):
 
     template_name = "users/profile_success.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Any:
         context = super().get_context_data(**kwargs)
         context["message"] = "Ваш профиль успешно обновлен!"
         return context
@@ -81,11 +86,11 @@ class ProfileSuccessView(TemplateView):
 class EditProfileView(View):
     """Контроллер для доступа к форме обновления данных пользователя"""
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         form = UserProfileForm(instance=request.user)  # Предполагая, что у вас есть форма
         return render(request, "users/edit_profile.html", {"form": form})
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()

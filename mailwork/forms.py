@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from typing import Any, Dict, List, Optional
 
 from .models import Message, NewsLetter, Recipient
 
@@ -15,7 +16,7 @@ class RecipientForm(forms.ModelForm):
             "comment",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Dict[str, Any]) -> None:
         super(RecipientForm, self).__init__(*args, **kwargs)
 
         self.fields["email"].widget.attrs.update({"class": "form-control", "placeholder": "Введите email"})
@@ -35,19 +36,22 @@ class MessageForm(forms.ModelForm):
             "content",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Dict[str, Any]) -> None:
         super(MessageForm, self).__init__(*args, **kwargs)
 
         self.fields["theme"].widget.attrs.update({"class": "form-control", "placeholder": "Введите тему сообщения"})
 
         self.fields["content"].widget.attrs.update({"class": "form-control", "placeholder": "Введите текст сообщения"})
 
-    # Пример валидации
-    def clean_body(self):
-        content = self.cleaned_data.get("content")
+    def clean_content(self) -> str:
+        """Валидация содержимого поля 'content'"""
+        content = self.cleaned_data.get("content", "")  # Получаем значение поля, по умолчанию пустая строка
+        if not isinstance(content, str):  # Проверяем, является ли content строкой
+            raise ValidationError("Сообщение должно содержать минимум 10 символов.")
+
         if len(content) < 10:  # Пример валидации длины
             raise ValidationError("Сообщение должно содержать минимум 10 символов.")
-        return content
+        return content  # Возвращаем значение, которое точно является строкой
 
 
 class NewsLetterForm(forms.ModelForm):
@@ -71,7 +75,7 @@ class NewsLetterForm(forms.ModelForm):
             "status",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Dict[str, Any]) -> None:
         super(NewsLetterForm, self).__init__(*args, **kwargs)
 
         # Добавляем классы для стиля
@@ -79,9 +83,9 @@ class NewsLetterForm(forms.ModelForm):
             {"class": "form-control", "placeholder": "Введите сообщение для рассылки"}
         )
 
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         """Метод для обработки нового адресата"""
-        cleaned_data = super().clean()
+        cleaned_data: Dict[str, Any] = super().clean()
         new_email = cleaned_data.get("new_recipient_email")
 
         # Если введен новый email, добавляем его в модель Recipient
@@ -89,6 +93,8 @@ class NewsLetterForm(forms.ModelForm):
             # Создаем нового адресата и добавляем его к получателям
             recipient, created = Recipient.objects.get_or_create(email=new_email)
             # Добавляем нового адресата в выбор получателей
-            cleaned_data["recipients"].add(recipient)
+            recipients = cleaned_data.get("recipients") or []  # Получаем существующих получателей или пустой список
+            recipients.append(recipient)  # Добавляем нового адресата
+            cleaned_data["recipients"] = recipients  # Обновляем cleaned_data
 
         return cleaned_data  # Возвращаем очищенные данные

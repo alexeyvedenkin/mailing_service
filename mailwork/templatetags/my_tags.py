@@ -4,7 +4,7 @@ register = template.Library()
 
 
 @register.filter()
-def media_filter(path):
+def media_filter(path: str) -> str:
     if path:
         return f"/media/{path}"
     return "#"
