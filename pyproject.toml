@@ -28,6 +28,7 @@ disallow_untyped_defs = true
 no_implicit_optional = true
 warn_return_any = true
 exclude = 'venv'
+ignore_missing_imports = true
 
 [tool.isort]
 line_length = 119
@@ -47,6 +48,3 @@ exclude = '''
   )/
 )
 '''
-
-[mypy]
-ignore_missing_imports=True
