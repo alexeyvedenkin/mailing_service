@@ -85,7 +85,7 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
     model = Message
     form_class = MessageForm
     template_name = "mailwork/message_form.html"
-    success_url = reverse_lazy("mailwork:messages_list")
+    success_url = reverse_lazy("mailwork:user_owned_messages")
 
 
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
@@ -93,6 +93,9 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
 
     model = Message
 
+    def get_success_url(self):
+        # Перенаправление на URL с именем "user_owned_messages" после успешного удаления
+        return reverse_lazy('mailwork:user_owned_messages')
 
 @login_required
 @permission_required("mailwork.can_unpublish_message", raise_exception=True)
@@ -100,7 +103,7 @@ def publish_message(request: HttpRequest, message_id: int) -> HttpResponse:
     message = get_object_or_404(Message, pk=message_id)
     message.is_published = True
     message.save()
-    return redirect("catalog:non_published_products")
+    return redirect("mailwork:newsletter_create")
 
 
 @login_required

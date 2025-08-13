@@ -8,10 +8,8 @@
                      <p class="card-text">Вы действительно хотите удалить {{ object.name }} ?</p>
                      <div class="card-body">
                          {% csrf_token %}
-                         <button type="submit" class="btn btn-primary">
-                             Удалить
-                         </button>
-                         <a class="p-2 btn btn-outline-primary" href="/messages_list/">Отмена</a>
+                         <button type="submit" class="btn btn-danger">Удалить</button>
+                         <a href="{% url 'mailwork:user_owned_messages' %}" class="btn btn-primary">Отмена</a>
                      </div>
                  </div>
             </form>

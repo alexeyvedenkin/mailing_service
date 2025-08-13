@@ -39,10 +39,6 @@
     <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
           href="{% url 'mailwork:user_owned_messages' %}">Мои сообщения</a></p>
     {% endif %}
-    {% if perms.catalog.can_unpublish_product %}
-        <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
-            href="{% url 'mailwork:non_published_messages' %}">Неопубликованные сообщения</a></p>
-    {% endif %}
     <div class="row text-center">
         {% for product in products %}
         <div class="col-3">
