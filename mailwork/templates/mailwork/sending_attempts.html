@@ -1,0 +1,25 @@
+{% extends 'mailwork/base.html' %}
+
+{% block title %}Пример Шаблона{% endblock %}
+
+{% block content %}
+    <h1>Попытки рассылки</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата и время</th>
+                <th>Статус</th>
+                <th>Ответ почтового сервера</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attempt in attempts %}
+            <tr>
+                <td>{{ attempt.attempt_time }}</td>
+                <td>{{ attempt.status }}</td>
+                <td>{{ attempt.server_response }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

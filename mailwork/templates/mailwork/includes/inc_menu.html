@@ -6,6 +6,7 @@
             <a class="p-2 btn btn-outline-primary me-2" href="{% url 'mailwork:messages_list' %}">Сообщения</a>
             <a class="p-2 btn btn-outline-primary me-2" href="{% url 'mailwork:recipients_list' %}">Адресаты</a>
             <a class="p-2 btn btn-outline-primary me-2" href="{% url 'mailwork:newsletters_list' %}">Рассылки</a>
+            <a class="p-2 btn btn-outline-primary me-2" href="{% url 'mailwork:sending_attempts' %}">Попытки рассылки</a>
             <a class="nav-link me-2" href="{% url 'users:edit_profile' %}">{{ user.email }}</a>
             <form id="logout-form" action="{% url 'users:logout' %}" method="POST" style="display: none;">
                 {% csrf_token %}

@@ -330,6 +330,16 @@ class SendingAttemptCreateView(LoginRequiredMixin, CreateView):
     template_name = "mailwork/newsletter_start.html"
 
 
+class SendingAttemptListView(LoginRequiredMixin, ListView):
+    model = SendingAttempt
+    template_name = "mailwork/sending_attempts.html"
+    context_object_name = "attempts"
+
+    def get_queryset(self):
+        """Фильтр для отображения только попыток рассылок текущего пользователя"""
+        return SendingAttempt.objects.filter(newsletter__recipients__owner=self.request.user)
+
+
 def newsletter_start(request: HttpRequest, pk: int) -> HttpResponse:
     """Обработчик для запуска рассылки"""
     newsletter = get_object_or_404(NewsLetter, pk=pk)
