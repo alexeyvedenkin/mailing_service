@@ -1,7 +1,7 @@
 import secrets
 from typing import Any
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpRequest, HttpResponse
@@ -15,6 +15,25 @@ from config.settings import EMAIL_HOST_USER
 
 from .forms import CustomAuthenticationForm, UserCreateForm, UserProfileForm
 from .models import User
+
+
+def manager_required(function):
+    """Проверка на то, что пользователь - менеджер"""
+    return user_passes_test(lambda u: u.is_authenticated and u.is_manager)(function)  # Убедитесь, что у вас есть поле или метод is_manager в модели User
+
+@manager_required
+def user_list(request: HttpRequest) -> HttpResponse:
+    """Представление для просмотра списка пользователей"""
+    users = User.objects.all()  # Получаем всех пользователей
+    return render(request, "users/user_list.html", {"users": users})
+
+@manager_required
+def block_user(request: HttpRequest, user_id: int) -> HttpResponse:
+    """Представление для блокировки пользователя"""
+    user = get_object_or_404(User, id=user_id)
+    user.is_active = False  # Блокируем пользователя
+    user.save()
+    return redirect("users:user_list")  # Перенаправление на список пользователей
 
 
 class RegisterView(CreateView):

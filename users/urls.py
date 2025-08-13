@@ -4,7 +4,8 @@ from django.urls import path
 
 from users.apps import UsersConfig
 
-from .views import CustomLoginView, EditProfileView, ProfileSuccessView, RegisterView, email_verification
+from .views import CustomLoginView, EditProfileView, ProfileSuccessView, RegisterView, email_verification, user_list, \
+    block_user
 
 app_name = UsersConfig.name
 
@@ -19,4 +20,7 @@ urlpatterns = [
     path("email-confirm/<str:token>/", email_verification, name="email-confirm"),
     path("edit_profile/", EditProfileView.as_view(), name="edit_profile"),
     path("profile/success/", login_required(ProfileSuccessView.as_view()), name="profile_success"),
+
+    path('users/', user_list, name='user_list'),
+    path('users/block/<int:user_id>/', block_user, name='block_user'),
 ]
