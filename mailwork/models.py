@@ -2,7 +2,6 @@ from typing import Any
 
 from django.core.mail import send_mail
 from django.db import models
-from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 from config.settings import DEFAULT_FROM_EMAIL

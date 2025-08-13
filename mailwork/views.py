@@ -68,7 +68,8 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     template_name = "mailwork/message_form.html"
     success_url = reverse_lazy("mailwork:messages_list")
 
-    def form_valid(self, form):
+    def form_valid(self, form: MessageForm) -> Any:
+        """ Метод для установки владельца сообщения """
         form.instance.owner = self.request.user  # Установить владельца сообщения
         return super().form_valid(form)  # Сохранить форму
 
@@ -93,9 +94,10 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
 
     model = Message
 
-    def get_success_url(self):
+    def get_success_url(self) -> Any:
         # Перенаправление на URL с именем "user_owned_messages" после успешного удаления
-        return reverse_lazy('mailwork:user_owned_messages')
+        return reverse_lazy("mailwork:user_owned_messages")
+
 
 @login_required
 @permission_required("mailwork.can_unpublish_message", raise_exception=True)

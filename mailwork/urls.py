@@ -14,14 +14,12 @@ app_name = MailworkConfig.name
 urlpatterns = [
     # Главная страница
     path("", HomeTemplateView.as_view(), name="home"),
-
     # Адресаты
     path("recipients_list/", RecipientListView.as_view(), name="recipients_list"),
     path("recipient_detail/<int:pk>/", RecipientDetailView.as_view(), name="recipient_detail"),
     path("recipient_create/", RecipientCreateView.as_view(), name="recipient_create"),
     path("recipient/<int:pk>/update/", RecipientUpdateView.as_view(), name="recipient_update"),
     path("recipient/<int:pk>/delete/", RecipientDeleteView.as_view(), name="recipient_delete"),
-
     # Сообщения
     path("non_published_messages/", NonPublishedMessageListView.as_view(), name="non_published_messages"),
     path("owned-messages/", UserOwnedMessageListView.as_view(), name="user_owned_messages"),
@@ -32,7 +30,6 @@ urlpatterns = [
     path("message/<int:pk>/", MessageDetailView.as_view(), name="message_detail"),
     path("message/<int:pk>/update/", MessageUpdateView.as_view(), name="message_update"),
     path("message/<int:pk>/delete/", MessageDeleteView.as_view(), name="message_delete"),
-
     # Рассылки
     path("newsletters/", NewsLetterListView.as_view(), name="newsletters_list"),
     path("newsletter_create/", NewsLetterCreateView.as_view(), name="newsletter_create"),
