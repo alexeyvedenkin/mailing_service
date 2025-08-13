@@ -1,6 +1,6 @@
 from typing import Any
 
-from .models import NewsLetter, SendingAttempt
+from .models import NewsLetter, SendingAttempt, Recipient
 
 
 class NewsletterService:
@@ -9,12 +9,12 @@ class NewsletterService:
     def overall_statistics(cls) -> Any:
         """Получение общей статистики по всем рассылкам"""
         try:
-            total_newsletters = cls.objects.count()  # Общее количество рассылок
-            active_count = cls.active_count()
+            total_newsletters = NewsLetter.objects.count()  # Общее количество рассылок
+            active_count = NewsLetter.active_count()
             total_attempts = SendingAttempt.objects.count()  # Общее количество попыток
             successful_attempts = SendingAttempt.objects.filter(status="success").count()  # Успешные попытки
             failed_attempts = SendingAttempt.objects.filter(status="failure").count()  # Неудачные попытки
-            unique_recipient_count = cls.unique_recipient_count()
+            unique_recipient_count = NewsLetter.unique_recipient_count()
 
             return {
                 "total_newsletters": total_newsletters,

@@ -12,6 +12,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, T
 
 from mailwork.forms import MessageForm, NewsLetterForm, RecipientForm
 from mailwork.models import Message, NewsLetter, Recipient, SendingAttempt
+from mailwork.services import NewsletterService
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
@@ -48,7 +49,7 @@ class RecipientDetailView(LoginRequiredMixin, DetailView):
     model = Recipient
 
     def get_queryset(self) -> Any:
-        # Позволяем пользователю видеть только своих адресатов или всем для менеджеров
+        # Позволяем пользователю видеть только своих адресатов или всех для менеджеров
         if self.request.user.is_manager:
             return Recipient.objects.all()
         return Recipient.objects.filter(owner=self.request.user)
@@ -254,7 +255,7 @@ class HomeTemplateView(TemplateView):
         """Получает контекстные данные для главной страницы"""
         context = super().get_context_data(**kwargs)
 
-        statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
+        statistics = NewsletterService.overall_statistics()  # Получаем общую статистику
 
         if statistics["total_newsletters"] == 0 and statistics["total_attempts"] == 0:
             statistics = {
