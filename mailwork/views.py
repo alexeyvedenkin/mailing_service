@@ -168,7 +168,7 @@ class NewsLetterListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     context_object_name = "newsletters"
     template_name = "mailwork/newsletters_list.html"
 
-    def test_func(self):
+    def test_func(self) -> Any:
         return self.request.user.is_staff or self.request.user == self.get_queryset().owner
 
 
@@ -198,7 +198,7 @@ class NewsLetterCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
         return super().form_valid(form)  # Возвращаем результат родительского метода
 
-    def test_func(self):
+    def test_func(self) -> Any:
         return self.request.user.is_staff or self.request.user.groups.filter(name='Пользователь').exists()
 
 
@@ -233,7 +233,7 @@ class NewsLetterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             # Проверка, что форма невалидна и передача ошибки
             return self.form_invalid(self.get_form())
 
-    def test_func(self):
+    def test_func(self) -> Any:
         return self.request.user.is_staff or self.get_object().owner == self.request.user
 
 
@@ -242,7 +242,7 @@ class NewsLetterDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     model = NewsLetter
 
-    def test_func(self):
+    def test_func(self) -> Any:
         return self.request.user.is_staff or self.get_object().owner == self.request.user
 
 
@@ -335,7 +335,7 @@ class SendingAttemptListView(LoginRequiredMixin, ListView):
     template_name = "mailwork/sending_attempts.html"
     context_object_name = "attempts"
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Фильтр для отображения только попыток рассылок текущего пользователя"""
         return SendingAttempt.objects.filter(newsletter__recipients__owner=self.request.user)
 

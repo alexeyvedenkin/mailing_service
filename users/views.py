@@ -17,15 +17,17 @@ from .forms import CustomAuthenticationForm, UserCreateForm, UserProfileForm
 from .models import User
 
 
-def manager_required(function):
+def manager_required(function: Any) -> Any:
     """Проверка на то, что пользователь - менеджер"""
-    return user_passes_test(lambda u: u.is_authenticated and u.is_manager)(function)  # Убедитесь, что у вас есть поле или метод is_manager в модели User
+    return user_passes_test(lambda u: u.is_authenticated and u.is_manager)(function)
+
 
 @manager_required
 def user_list(request: HttpRequest) -> HttpResponse:
     """Представление для просмотра списка пользователей"""
     users = User.objects.all()  # Получаем всех пользователей
     return render(request, "users/user_list.html", {"users": users})
+
 
 @manager_required
 def block_user(request: HttpRequest, user_id: int) -> HttpResponse:

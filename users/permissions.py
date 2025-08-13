@@ -1,8 +1,3 @@
-from django.contrib.auth.models import Permission
-from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponseForbidden
-from django.utils.decorators import method_decorator
-from django.views import View
 from .models import User
 
 

@@ -1,6 +1,6 @@
 from typing import Any
 
-from .models import NewsLetter, SendingAttempt, Recipient
+from .models import NewsLetter, SendingAttempt
 
 
 class NewsletterService:
@@ -36,7 +36,7 @@ class NewsletterService:
             }
 
     @staticmethod
-    def get_newsletter_info(self) -> Any:
+    def get_newsletter_info(self: Any) -> Any:
         """Получение информации о состоянии всех полей рассылки"""
         # Формируем информацию о рассылке
 

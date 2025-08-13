@@ -68,12 +68,12 @@ class NewsLetter(models.Model):
     recipients = models.ManyToManyField(Recipient, verbose_name="Получатели")
 
     @classmethod
-    def active_count(cls):
+    def active_count(cls) -> Any:
         """Возвращает количество активных рассылок"""
         return cls.objects.filter(status="started").count()
 
     @classmethod
-    def unique_recipient_count(cls):
+    def unique_recipient_count(cls) -> Any:
         """Возвращает количество уникальных получателей"""
         return Recipient.objects.filter(newsletter__status="started").distinct().count()
 
