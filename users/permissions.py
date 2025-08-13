@@ -13,14 +13,7 @@ class UserPermissions:
 
     @staticmethod
     def has_permission(user: User, action: str, object_owner: User) -> bool:
-        """
-        Проверяет, имеет ли пользователь право выполнять действие над объектом.
-
-        :param user: пользователь, который запрашивает действие
-        :param action: действие, которое выполняется ('create', 'view', 'edit', 'delete')
-        :param object_owner: владелец объекта (клиент или рассылка)
-        :return: True если действие разрешено, иначе False
-        """
+        """ Проверяет, имеет ли пользователь право выполнять действие над объектом """
 
         if user.is_manager():
             # Менеджеры могут видеть всех

@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -21,8 +21,15 @@ class RecipientListView(LoginRequiredMixin, ListView):
     context_object_name = "recipients"
     template_name = "mailwork/recipients_list.html"
 
+    def get_queryset(self) -> Any:
+        # Если пользователь - менеджер, показываем всех адресатов
+        if self.request.user.is_manager:  # Предполагается, что есть поле is_manager
+            return Recipient.objects.all()
+        # Иначе показываем только адресатов текущего пользователя
+        return Recipient.objects.filter(owner=self.request.user)
 
-class RecipientCreateView(LoginRequiredMixin, CreateView):
+
+class RecipientCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """Контроллер для создания экземпляра класса Recipient"""
 
     model = Recipient
@@ -30,14 +37,24 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
     template_name = "mailwork/recipient_form.html"
     success_url = reverse_lazy("mailwork:recipient_list")
 
+    def form_valid(self, form: RecipientForm) -> HttpResponse:
+        form.instance.owner = self.request.user  # Присваиваем текущего пользователя как владельца
+        return super().form_valid(form)
+
 
 class RecipientDetailView(LoginRequiredMixin, DetailView):
     """Контроллер для отображения экземпляра класса Recipient"""
 
     model = Recipient
 
+    def get_queryset(self) -> Any:
+        # Позволяем пользователю видеть только своих адресатов или всем для менеджеров
+        if self.request.user.is_manager:
+            return Recipient.objects.all()
+        return Recipient.objects.filter(owner=self.request.user)
 
-class RecipientUpdateView(LoginRequiredMixin, UpdateView):
+
+class RecipientUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """Контроллер для редактирования экземпляра класса Recipient"""
 
     model = Recipient
@@ -45,11 +62,25 @@ class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "mailwork/recipient_form.html"
     success_url = reverse_lazy("mailwork:recipient_list")
 
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        recipient = self.get_object()
+        if recipient.owner != request.user:
+            # Проверка, если не менеджер или не владелец
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
 
-class RecipientDeleteView(LoginRequiredMixin, DeleteView):
+
+class RecipientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Контроллер для удаления экземпляра класса Recipient"""
 
     model = Recipient
+
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        recipient = self.get_object()
+        if recipient.owner != request.user:
+            # Проверка, если не менеджер или не владелец
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
 
 
 class MessageListView(LoginRequiredMixin, ListView):

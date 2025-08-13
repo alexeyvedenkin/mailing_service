@@ -18,6 +18,10 @@ class Recipient(models.Model):
     class Meta:
         verbose_name = "Адресат"
         verbose_name_plural = "Адресаты"
+        permissions = [
+            ("can_add_recipient", "Может добавлять адресатов"),
+            ("can_view_recipient", "Может просматривать адресатов"),
+        ]
 
     def __str__(self) -> str:
         """Определяет формат вывода экземпляра класса Recipient"""
@@ -34,6 +38,10 @@ class Message(models.Model):
     class Meta:
         verbose_name = "Письмо"
         verbose_name_plural = "Письма"
+        permissions = [
+            ("can_send_message", "Может отправлять письма"),
+            ("can_view_message", "Может просматривать письма"),
+        ]
 
     def __str__(self) -> str:
         """Определяет формат вывода экземпляра класса Message"""
@@ -59,6 +67,10 @@ class NewsLetter(models.Model):
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
+        permissions = [
+            ("can_finish_newsletter", "Может завершать рассылки"),
+            ("can_view_newsletter", "Может просматривать рассылки"),
+        ]
 
     def start(self) -> None:
         """Запускает рассылку и устанавливает время первого отправления"""
