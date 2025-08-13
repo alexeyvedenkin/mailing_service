@@ -5,81 +5,41 @@
     <h1 class="display-4">Мои сообщения</h1>
 </div>
 <div class="container">
-    <h2 class="my-4">Опубликованные сообщения</h2> <!-- Heading for published products -->
+    <!-- Добавляем таблицу для вывода сообщений -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Тема</th>
+                <th>Владелец</th>
+                <th>Содержание</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in owned_messages %}
+            <tr>
+                <td>{{ message.theme }}</td> <!-- Выводим тему сообщения -->
+                <td>{{ message.owner }}</td> <!-- Выводим владельца сообщения -->
+                <td>{{ message.content|truncatechars:100 }}</td> <!-- Выводим краткое содержание сообщения -->
+                {% if perms.mailwork.can_unpublish_message %}
+                    <td>
+                        <a type="button" class="btn btn-outline-primary"
+                           href="{% url 'mailwork:message_update' message.pk %}">Редактировать</a>
+                        <a type="button" class="btn btn-outline-success"
+                           href="{% url 'mailwork:publish_message' message.pk %}">Добавить в рассылку</a>
+                        <a type="button" class="btn btn-outline-danger"
+                           href="{% url 'mailwork:message_delete' message.pk %}">Удалить</a>
+                    </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% if user.is_authenticated %}
         <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
               href="{% url 'mailwork:messages_list' %}">Вернуться</a></p>
         <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
               href="{% url 'mailwork:message_create' %}">Добавить сообщение</a></p>
     {% endif %}
-    <div class="row text-center">
-        {% for message in object_list %}
-            {% if message.is_published %} <!-- Check if product is published -->
-            <div class="col-3">
-                <div class="card mb-4 box-shadow">
-                    <div class="card-header">
-                        <h4 class="my-0 font-weight-normal">{{ message.theme }}</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <h3 class="card-title pricing-card-title">{{ message.theme }}</h3>
-                            <div class="col-2"></div>
-                            <div class="col-8">
-                                {% if user.is_authenticated %}
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
-                                       href="{% url 'mailwork:message_detail' message.pk %}">Подробнее</a>
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
-                                       href="{% url 'mailwork:message_update' message.pk %}">Редактировать</a>
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-danger w-100"
-                                       href="{% url 'mailwork:message_delete' message.pk %}">Удалить</a>
-                                    {% if perms.mailwork.can_unpublish_message %}
-                                       <a type="button" class="btn btn-lg btn-block btn-outline-success w-100"
-                                          href="{% url 'mailwork:publish_message' message.pk %}">Опубликовать сообщение</a>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <div class="col-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    <h2 class="my-4">Неопубликованные сообщения</h2> <!-- Heading for unpublished products -->
-    <div class="row text-center">
-        {% for message in object_list %}
-            {% if not message.is_published %} <!-- Check if product is NOT published -->
-            <div class="col-3">
-                <div class="card mb-4 box-shadow">
-                    <div class="card-header">
-                        <h4 class="my-0 font-weight-normal">{{ message.theme }}</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <h3 class="card-title pricing-card-title">{{ message.theme }}</h3>
-                            <div class="col-2"></div>
-                            <div class="col-8">
-                                {% if user.is_authenticated %}
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
-                                       href="{% url 'mailwork:message_detail' message.pk %}">Подробнее</a>
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
-                                       href="{% url 'mailwork:message_update' message.pk %}">Редактировать</a>
-                                    <a type="button" class="btn btn-lg btn-block btn-outline-danger w-100"
-                                       href="{% url 'mailwork:message_delete' message.pk %}">Удалить</a>
-                                    {% if perms.mailwork.can_unpublish_message %}
-                                       <a type="button" class="btn btn-lg btn-block btn-outline-success w-100"
-                                          href="{% url 'mailwork:publish_message' message.pk %}">Опубликовать сообщение</a>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <div class="col-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        {% endfor %}
-    </div>
 </div>
 {% endblock %}
