@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -160,15 +160,18 @@ def unpublish_message(request: HttpRequest, message_id: int) -> HttpResponse:
     return redirect("mailwork:non_published_messages")
 
 
-class NewsLetterListView(LoginRequiredMixin, ListView):
+class NewsLetterListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Контроллер для отображения списка рассылок"""
 
     model = NewsLetter
     context_object_name = "newsletters"
     template_name = "mailwork/newsletters_list.html"
 
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user == self.get_queryset().owner
 
-class NewsLetterCreateView(LoginRequiredMixin, CreateView):
+
+class NewsLetterCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """Контроллер для создания экземпляра класса NewsLetter"""
 
     model = NewsLetter
@@ -194,6 +197,9 @@ class NewsLetterCreateView(LoginRequiredMixin, CreateView):
 
         return super().form_valid(form)  # Возвращаем результат родительского метода
 
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.groups.filter(name='Пользователь').exists()
+
 
 class NewsLetterDetailView(LoginRequiredMixin, DetailView):
     """Контроллер для отображения экземпляра класса NewsLetter"""
@@ -201,7 +207,7 @@ class NewsLetterDetailView(LoginRequiredMixin, DetailView):
     model = NewsLetter
 
 
-class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
+class NewsLetterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Контроллер для редактирования экземпляра класса NewsLetter"""
 
     model = NewsLetter
@@ -226,11 +232,17 @@ class NewsLetterUpdateView(LoginRequiredMixin, UpdateView):
             # Проверка, что форма невалидна и передача ошибки
             return self.form_invalid(self.get_form())
 
+    def test_func(self):
+        return self.request.user.is_staff or self.get_object().owner == self.request.user
 
-class NewsLetterDeleteView(LoginRequiredMixin, DeleteView):
+
+class NewsLetterDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Контроллер для удаления экземпляра класса NewsLetter"""
 
     model = NewsLetter
+
+    def test_func(self):
+        return self.request.user.is_staff or self.get_object().owner == self.request.user
 
 
 class HomeTemplateView(TemplateView):
