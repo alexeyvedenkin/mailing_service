@@ -67,6 +67,16 @@ class NewsLetter(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, verbose_name="Содержание сообщения")
     recipients = models.ManyToManyField(Recipient, verbose_name="Получатели")
 
+    @classmethod
+    def active_count(cls):
+        """Возвращает количество активных рассылок"""
+        return cls.objects.filter(status="started").count()
+
+    @classmethod
+    def unique_recipient_count(cls):
+        """Возвращает количество уникальных получателей"""
+        return Recipient.objects.filter(newsletter__status="started").distinct().count()
+
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"

@@ -257,15 +257,17 @@ class HomeTemplateView(TemplateView):
         statistics = NewsLetter.overall_statistics()  # Получаем общую статистику
 
         if statistics["total_newsletters"] == 0 and statistics["total_attempts"] == 0:
-            # Обработка случая, когда статистика отсутствует
             statistics = {
                 "total_newsletters": 0,
                 "total_attempts": 0,
                 "successful_attempts": 0,
                 "failed_attempts": 0,
+                "active_newsletters": 0,  # Установлено количество активных рассылок
+                "unique_recipients": 0,  # Установлено количество уникальных получателей
             }
-
-        context.update(statistics)
+        else:
+            statistics["active_newsletters"] = NewsLetter.active_count()
+            statistics["unique_recipients"] = NewsLetter.unique_recipient_count()
 
         return context
 
