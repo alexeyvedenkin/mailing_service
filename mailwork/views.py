@@ -90,6 +90,11 @@ class MessageListView(LoginRequiredMixin, ListView):
     context_object_name = "messages"
     template_name = "mailwork/messages_list.html"
 
+    def get_queryset(self) -> Any:  # Определяем метод для фильтрации запросов
+        if self.request.user.is_staff:  # Если менеджер
+            return Message.objects.all()  # Все сообщения
+        return Message.objects.filter(owner=self.request.user)  # Только свои сообщения
+
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
     """Контроллер для создания экземпляра класса Message"""
@@ -119,6 +124,9 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "mailwork/message_form.html"
     success_url = reverse_lazy("mailwork:user_owned_messages")
 
+    def get_queryset(self) -> Any:  # Переопределяем метод для проверки прав доступа
+        return Message.objects.filter(owner=self.request.user)  # Только свои сообщения
+
 
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
     """Контроллер для удаления экземпляра класса Message"""
@@ -128,6 +136,9 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self) -> Any:
         # Перенаправление на URL с именем "user_owned_messages" после успешного удаления
         return reverse_lazy("mailwork:user_owned_messages")
+
+    def get_queryset(self) -> Any:  # Переопределяем метод для проверки прав доступа
+        return Message.objects.filter(owner=self.request.user)  # Только свои сообщения
 
 
 @login_required
