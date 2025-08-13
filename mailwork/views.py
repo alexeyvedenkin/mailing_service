@@ -269,6 +269,9 @@ class HomeTemplateView(TemplateView):
             statistics["active_newsletters"] = NewsLetter.active_count()
             statistics["unique_recipients"] = NewsLetter.unique_recipient_count()
 
+        # Добавляем статистику в контекст для шаблона
+        context.update(statistics)
+
         return context
 
 
