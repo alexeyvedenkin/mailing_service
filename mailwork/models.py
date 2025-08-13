@@ -146,16 +146,16 @@ class SendingAttempt(models.Model):
         """Определяет формат вывода экземпляра класса SendingAttempt"""
         return f"Попытка: {self.attempt_time}, Статус: {self.status}"
 
-    def send_newsletter(self, user: User) -> None:  # Добавляем параметр user
+    def send_newsletter(self, user: User) -> None:
         """Инициализация отправки рассылки"""
-        recipients = self.newsletter.recipients.all()  # type: ignore
+        recipients = self.newsletter.recipients.all()
         for recipient in recipients:
-            email = recipient.email  # email экземпляра Recipient
+            email = recipient.email
             try:
                 # Отправка сообщения
                 send_mail(
-                    self.newsletter.message.theme,  # type: ignore
-                    self.newsletter.message.content,  # type: ignore
+                    self.newsletter.message.theme,
+                    self.newsletter.message.content,
                     from_email=DEFAULT_FROM_EMAIL,
                     recipient_list=[email],
                     fail_silently=False,
@@ -168,8 +168,8 @@ class SendingAttempt(models.Model):
 
     def create_attempt(self, status: str, response: str) -> None:
         """Создание записи о попытке рассылки"""
-        SendingAttempt.objects.create(  # type: ignore
-            attempt_time=timezone.now(),  # type: ignore
+        SendingAttempt.objects.create(
+            attempt_time=timezone.now(),
             status=status,
             server_response=response,
             newsletter=self.newsletter,

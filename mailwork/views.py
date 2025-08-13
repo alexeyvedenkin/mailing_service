@@ -338,10 +338,11 @@ def newsletter_start(request: HttpRequest, pk: int) -> HttpResponse:
         print(f"Получен POST-запрос для рассылки с pk={pk}")
         try:
             if newsletter.status != "completed":
-                # Если рассылка не запущена, меняем статус и записываем время
-                newsletter.status = "started"
                 current_time = timezone.now()
-                newsletter.first_send_time = current_time
+                # Если рассылка не запущена, меняем статус и записываем время
+                if newsletter.status == "created":
+                    newsletter.first_send_time = current_time
+                newsletter.status = "started"
                 newsletter.last_send_time = current_time
                 newsletter.save()
 
