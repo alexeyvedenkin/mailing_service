@@ -19,6 +19,8 @@ class User(AbstractUser):
         "username",
     ]
 
+    is_manager = models.BooleanField(default=False)
+
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"

@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 
+from config import settings
 from config.settings import DEFAULT_FROM_EMAIL
 from users.models import User
 
@@ -14,6 +15,8 @@ class Recipient(models.Model):
     email = models.EmailField(unique=True, verbose_name="Email")
     fullname = models.CharField(max_length=100, verbose_name="ФИО")
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Добавлено поле owner
 
     class Meta:
         verbose_name = "Адресат"

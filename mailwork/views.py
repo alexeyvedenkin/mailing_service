@@ -339,8 +339,7 @@ def newsletter_start(request: HttpRequest, pk: int) -> HttpResponse:
             messages.error(request, f"Ошибка при запуске рассылки: {str(e)}")
             return redirect("mailwork:newsletters_list")  # Добавляем редирект при ошибке
     else:
-        # Если метод не POST, можно тоже вернуть редирект или ответ
-        return redirect("mailwork:newsletters_list")  # В этом случае тоже надо вернуть редирект
+        return redirect("mailwork:newsletters_list")  # Возвращаем редирект
 
 
 def newsletter_finish(request: HttpRequest, pk: int) -> HttpResponse:
