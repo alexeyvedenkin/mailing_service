@@ -68,6 +68,10 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     template_name = "mailwork/message_form.html"
     success_url = reverse_lazy("mailwork:messages_list")
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user  # Установить владельца сообщения
+        return super().form_valid(form)  # Сохранить форму
+
 
 class MessageDetailView(LoginRequiredMixin, DetailView):
     """Контроллер для отображения экземпляра класса Message"""

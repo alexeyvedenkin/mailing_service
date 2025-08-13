@@ -2,6 +2,7 @@ from typing import Any
 
 from django.core.mail import send_mail
 from django.db import models
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 from config.settings import DEFAULT_FROM_EMAIL
@@ -29,7 +30,7 @@ class Message(models.Model):
 
     theme = models.CharField(max_length=100, verbose_name="Тема письма")
     content = models.TextField(verbose_name="Содержание письма")
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец", default=1)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Владелец")
 
     class Meta:
         verbose_name = "Письмо"
