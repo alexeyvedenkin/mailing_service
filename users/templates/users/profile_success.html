@@ -1,0 +1,13 @@
+{% extends 'mailwork/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-5">
+            <form class="row" method="post" enctype="multipart/form-data">
+                <h1>{{ message }}</h1>
+                <a href="{% url 'users:edit_profile' %}">Вернуться к профилю</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

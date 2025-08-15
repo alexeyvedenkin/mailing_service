@@ -1,0 +1,21 @@
+{% extends 'mailwork/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-5">
+            <form class="row" method="post" enctype="multipart/form-data">
+                 <div class="card">
+                     <div class="card-body">
+                         {% csrf_token %}
+                         {{ form.as_p }}
+                         <button type="submit" class="btn btn-primary">
+                             Войти
+                         </button>
+                         <a class="p-2 btn btn-outline-primary" href="{% url 'mailwork:messages_list' %}">Отмена</a>
+                     </div>
+                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

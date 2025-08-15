@@ -1,0 +1,72 @@
+{% extends 'mailwork/base.html' %}
+
+{% block title %}Пример Шаблона{% endblock %}
+
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Наши рассылки</h1>
+</div>
+<div class="container">
+    <table class="table table-striped">
+        {% if user.is_authenticated %}
+        <thead>
+            <tr>
+                <th>Владелец</th>
+                <th>Статус</th>
+                <th>Дата первой отправки</th>
+                <th>Дата последней отправки</th>
+                <th>Сообщение</th>
+                <th>Адресаты</th>
+                <th>Всего попыток</th> <!-- Поле для общего количества попыток -->
+                <th>Успешные попытки</th> <!-- Поле для успешных попыток -->
+                <th>Неудачные попытки</th> <!-- Поле для неудачных попыток -->
+                <th>Доступные действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for newsletter in newsletters %}
+            <tr>
+                <td>{{ newsletter.owner }}</td> <!-- Выводим владельца рассылки -->
+                <td>{{ newsletter.get_status_display }}</td> <!-- Выводим статус рассылки -->
+                <td>{{ newsletter.first_send_time }}</td> <!-- Выводим дату первой отправки рассылки -->
+                <td>{{ newsletter.last_send_time }}</td> <!-- Выводим дату последней отправки рассылки -->
+                <td>{{ newsletter.message }}</td> <!-- Выводим тему сообщения из рассылки -->
+                <td>
+                    {% for recipient in newsletter.recipients.all %} <!-- Цикл по всем адресатам -->
+                        {{ recipient }}{% if not forloop.last %}, {% endif %} <!-- Объединяем адресаты через запятую -->
+                    {% endfor %}
+                </td>
+                <td>{{ newsletter.total_attempts }}</td> <!-- Отображаем общее количество попыток -->
+                <td>{{ newsletter.successful_attempts }}</td> <!-- Отображаем количество успешных попыток -->
+                <td>{{ newsletter.failed_attempts }}</td> <!-- Отображаем количество неудачных попыток -->
+                <td>
+                    {% if newsletter.status != "completed" %}
+                    <form action="{% url 'mailwork:newsletter_start' newsletter.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary">Запустить</button>
+                    </form>
+                    {% endif %}
+                    {% if perms.mailwork.can_unpublish_newsletter %}
+                        {% if newsletter.status != "completed" %}
+                            <form action="{% url 'mailwork:newsletter_finish' newsletter.pk %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">Завершить</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+          href="{% url 'mailwork:newsletter_create' %}">Добавить рассылку</a></p>
+    <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+          href="{% url 'mailwork:user_owner_newsletters' %}">Мои рассылки</a></p>
+    {% endif %}
+    {% if perms.catalog.can_unpublish_product %}
+        <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+            href="{% url 'mailwork:non_published_newsletters' %}">Неопубликованные рассылки</a></p>
+    {% endif %}
+</div>
+{% endblock %}

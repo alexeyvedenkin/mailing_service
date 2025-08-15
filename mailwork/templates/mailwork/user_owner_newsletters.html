@@ -1,0 +1,85 @@
+{% extends 'mailwork/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Мои рассылки</h1>
+</div>
+<div class="container">
+    <h2 class="my-4">Опубликованные рассылки</h2> <!-- Heading for published products -->
+    {% if user.is_authenticated %}
+        <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+              href="{% url 'mailwork:newsletters_list' %}">Вернуться</a></p>
+        <p><a type="button" class="btn btn-lg btn-block btn-outline-primary"
+              href="{% url 'mailwork:newsletter_create' %}">Добавить рассылку</a></p>
+    {% endif %}
+    <div class="row text-center">
+        {% for newsletters in object_list %}
+            {% if newsletter.is_published %} <!-- Check if product is published -->
+            <div class="col-3">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">{{ newsletter.theme }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <h3 class="card-title pricing-card-title">{{ newsletter.theme }}</h3>
+                            <div class="col-2"></div>
+                            <div class="col-8">
+                                {% if user.is_authenticated %}
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
+                                       href="{% url 'mailwork:newsletter_detail' newsletter.pk %}">Подробнее</a>
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
+                                       href="{% url 'mailwork:newsletter_update' newsletter.pk %}">Редактировать</a>
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-danger w-100"
+                                       href="{% url 'mailwork:newsletter_delete' newsletter.pk %}">Удалить</a>
+                                    {% if perms.mailwork.can_unpublish_newsletter %}
+                                       <a type="button" class="btn btn-lg btn-block btn-outline-success w-100"
+                                          href="{% url 'mailwork:publish_newsletter' newsletter.pk %}">Выполнить рассылку</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="col-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <h2 class="my-4">Неопубликованные рассылки</h2> <!-- Heading for unpublished products -->
+    <div class="row text-center">
+        {% for newsletters in object_list %}
+            {% if not newsletter.is_published %} <!-- Check if product is NOT published -->
+            <div class="col-3">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">{{ newsletter.theme }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <h3 class="card-title pricing-card-title">{{ newsletter.theme }}</h3>
+                            <div class="col-2"></div>
+                            <div class="col-8">
+                                {% if user.is_authenticated %}
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
+                                       href="{% url 'mailwork:newsletter_detail' newsletter.pk %}">Подробнее</a>
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-primary w-100"
+                                       href="{% url 'mailwork:newsletter_update' newsletter.pk %}">Редактировать</a>
+                                    <a type="button" class="btn btn-lg btn-block btn-outline-danger w-100"
+                                       href="{% url 'mailwork:newsletter_delete' newsletter.pk %}">Удалить</a>
+                                    {% if perms.mailwork.can_unpublish_newsletter %}
+                                       <a type="button" class="btn btn-lg btn-block btn-outline-success w-100"
+                                          href="{% url 'mailwork:publish_newsletter' message.pk %}">Запустить рассылку</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="col-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

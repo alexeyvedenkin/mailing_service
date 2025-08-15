@@ -1,0 +1,101 @@
+from typing import Any, Dict
+
+from django import forms
+from django.core.exceptions import ValidationError
+
+from .models import Message, NewsLetter, Recipient
+
+
+class RecipientForm(forms.ModelForm):
+    """Устанавливает параметры формы для создания и редактирования адресата"""
+
+    class Meta:
+        model = Recipient
+        fields = [
+            "email",
+            "fullname",
+            "comment",
+        ]
+
+    def __init__(self, *args: Any, **kwargs: Dict[str, Any]) -> None:
+        super(RecipientForm, self).__init__(*args, **kwargs)
+
+        self.fields["email"].widget.attrs.update({"class": "form-control", "placeholder": "Введите email"})
+
+        self.fields["fullname"].widget.attrs.update({"class": "form-control", "placeholder": "username"})
+
+        self.fields["comment"].widget.attrs.update({"class": "form-control", "placeholder": "Введите комментарий"})
+
+
+class MessageForm(forms.ModelForm):
+    """Устанавливает параметры формы для создания и редактирования сообщения"""
+
+    class Meta:
+        model = Message
+        fields = [
+            "theme",
+            "content",
+        ]
+
+    def __init__(self, *args: Any, **kwargs: Dict[str, Any]) -> None:
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        self.fields["theme"].widget.attrs.update({"class": "form-control", "placeholder": "Введите тему сообщения"})
+
+        self.fields["content"].widget.attrs.update({"class": "form-control", "placeholder": "Введите текст сообщения"})
+
+    def clean_content(self) -> str:
+        """Валидация содержимого поля 'content'"""
+        content = self.cleaned_data.get("content", "")  # Получаем значение поля, по умолчанию пустая строка
+        if not isinstance(content, str):  # Проверяем, является ли content строкой
+            raise ValidationError("Сообщение должно содержать минимум 10 символов.")
+
+        if len(content) < 10:  # Пример валидации длины
+            raise ValidationError("Сообщение должно содержать минимум 10 символов.")
+        return content  # Возвращаем значение, которое точно является строкой
+
+
+class NewsLetterForm(forms.ModelForm):
+    new_recipient_email = forms.EmailField(
+        required=False,
+        label="Новый адресат",
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Введите email нового адресата"}),
+    )
+
+    recipients = forms.ModelMultipleChoiceField(
+        queryset=Recipient.objects.all(),  # Получаем всех получателей
+        widget=forms.CheckboxSelectMultiple,  # Используем чекбоксы для выбора
+        required=False,
+    )  # Добавляем виджет для выбора адресатов
+
+    class Meta:
+        model = NewsLetter
+        fields = [
+            "message",
+            "recipients",
+            "status",
+        ]
+
+    def __init__(self, *args: Any, **kwargs: Dict[str, Any]) -> None:
+        super(NewsLetterForm, self).__init__(*args, **kwargs)
+
+        # Добавляем классы для стиля
+        self.fields["message"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Введите сообщение для рассылки"}
+        )
+
+    def clean(self) -> Dict[str, Any]:
+        """Метод для обработки нового адресата"""
+        cleaned_data: Dict[str, Any] = super().clean()
+        new_email = cleaned_data.get("new_recipient_email")
+
+        # Если введен новый email, добавляем его в модель Recipient
+        if new_email:
+            # Создаем нового адресата и добавляем его к получателям
+            recipient, created = Recipient.objects.get_or_create(email=new_email)
+            # Добавляем нового адресата в выбор получателей
+            recipients = cleaned_data.get("recipients") or []  # Получаем существующих получателей или пустой список
+            recipients.append(recipient)  # Добавляем нового адресата
+            cleaned_data["recipients"] = recipients  # Обновляем cleaned_data
+
+        return cleaned_data  # Возвращаем очищенные данные

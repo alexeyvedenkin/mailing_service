@@ -1,0 +1,8 @@
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Skystore</h1>
+    {% if user.is_authenticated %}
+        <p class="lead">Добро пожаловать на наш сайт, {{ user.email }}!</p>
+    {% else %}
+        <p class="lead">Добро пожаловать на наш сайт!</p>
+    {% endif %}
+</div>
